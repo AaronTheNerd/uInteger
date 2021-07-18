@@ -27,7 +27,7 @@ void fibo_fast(uint64_t n) {
     std::cout << res[0] << std::endl;
 }
 
-#define N 1000
+#define N 100000
 
 int main(int argc, char** argv) {
     auto start = std::chrono::high_resolution_clock::now();
