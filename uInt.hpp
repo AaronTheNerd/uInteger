@@ -19,14 +19,62 @@
 #define _UINTEGER_UINT_HPP_
 
 
+#define PERFORMANCE_TEST 1
+
+
 #include <climits> // CHAR_BIT
-#include <iostream>
 #include <stdexcept> // runtime_error
 #include <string> // std::string
 #include <vector> // std::vector
 
 
+#if PERFORMANCE_TEST
+    #include <iomanip>
+    #include <iostream>
+    #include <chrono>
+#endif
+
+
 namespace atn { // AaronTheNerd
+
+
+#if PERFORMANCE_TEST
+    #define TEST_RESOLUTION std::chrono::duration<double, std::milli>
+    enum {
+        REMOVE_LEAD_ZEROS_TIME,
+        INT_TO_UINT_TIME,
+        STRING_TO_UINT_TIME,
+        COPY_TIME,
+        ADD_TIME,
+        SUB_TIME,
+        MUL_TIME,
+        DIV_TIME,
+        MOD_TIME,
+        SL_TIME,
+        SR_TIME,
+        AND_TIME,
+        OR_TIME,
+        XOR_TIME,
+        EQ_TIME,
+        NEQ_TIME,
+        LT_TIME,
+        GT_TIME,
+        LTE_TIME,
+        GTE_TIME,
+        UINT_TO_STRING_TIME,
+        NUM_OF_TESTS
+    };
+    std::vector<TEST_RESOLUTION> durations(NUM_OF_TESTS);
+    auto start = std::chrono::high_resolution_clock::now();
+    auto stop = std::chrono::high_resolution_clock::now(); 
+    auto duration = stop - start;
+    #define START_TEST() \
+        start = std::chrono::high_resolution_clock::now();
+    #define END_TEST(x) \
+        stop = std::chrono::high_resolution_clock::now(); \
+        duration = stop - start; \
+        durations[x] += duration;
+    #endif
 
 
 // =========================== Class Declaration =========================== //
@@ -36,8 +84,14 @@ class uInt {
   private:
     // ========================== Helper Methods =========================== //
     void remove_lead_zeros() {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         while (!this->bits.back() && this->bits.size() != 0)
         this->bits.pop_back();
+        #if PERFORMANCE_TEST
+            END_TEST(REMOVE_LEAD_ZEROS_TIME)
+        #endif
     }
 
 
@@ -156,14 +210,23 @@ class uInt {
     uInt() : bits(std::vector<bool>()) {}
     uInt(const uint64_t& num) 
             : bits(std::vector<bool>()) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         uint64_t ull_size = sizeof(uint64_t) * CHAR_BIT;
         for (uint64_t i = 0; i < ull_size; ++i) {
             this->bits.emplace_back(((num & (1ull << i)) >> i) ? true : false);
         }
         this->remove_lead_zeros();
+        #if PERFORMANCE_TEST
+            END_TEST(INT_TO_UINT_TIME)
+        #endif
     }
     explicit uInt(const std::string& str) 
             : bits(std::vector<bool>()) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (str.size() == 0) {
             this->bits.clear();
             return;
@@ -182,22 +245,35 @@ class uInt {
             this->convert_decimal_string(str);
         }
         this->remove_lead_zeros();
+        #if PERFORMANCE_TEST
+            END_TEST(STRING_TO_UINT_TIME)
+        #endif
     }
     uInt(const uInt& n) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (this != &n) {
             this->bits.resize(n.bits.size(), false);
             for (int i = 0; i < this->bits.size(); ++i)
                 this->bits[i] = n.bits[i];
         }
+        #if PERFORMANCE_TEST
+            END_TEST(COPY_TIME)
+        #endif
     }
 
 
     // ============================= To String ============================= //
     std::string to_string() const;
+    std::string to_string(const uint64_t&) const;
     
 
     // ========================== Add and Assign =========================== //
     uInt& operator+=(const uInt& n) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         bool n1 = 0, n2 = 0, carry = 0;
         if (this->bits.size() < n.bits.size()) {
             this->bits.resize(n.bits.size(), false);
@@ -210,12 +286,18 @@ class uInt {
         }
         if (carry)
             this->bits.emplace_back(true);
+        #if PERFORMANCE_TEST
+            END_TEST(ADD_TIME)
+        #endif
         return *this;    
     }
     
     
     // ========================= Minus and Assign ========================== //
     uInt& operator-=(const uInt& n) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (*this <= n) {
             this->bits.clear();
             return *this;
@@ -237,24 +319,35 @@ class uInt {
             }
         }
         this->remove_lead_zeros();
+        #if PERFORMANCE_TEST
+            END_TEST(SUB_TIME)
+        #endif
         return *this;
     }
     
     
     // ======================== Multiply and Assign ======================== //
     uInt& operator*=(const uInt& n) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         uInt mult(0);
         for (uint64_t i = 0; i < this->bits.size(); ++i) {
             if (this->bits[i]) mult += (n << i);
         }
         this->bits = mult.bits;
+        #if PERFORMANCE_TEST
+            END_TEST(MUL_TIME)
+        #endif
         return *this;
     }
-    uInt& russian_peasant(const uInt& n);
     
     
     // ========================= Divide and Assign ========================= //    
     uInt& operator/=(const uInt& n) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (n == 0) {
             throw std::runtime_error("ERROR: Divide by 0 Exception");
         }
@@ -273,12 +366,18 @@ class uInt {
             }
         }
         this->remove_lead_zeros();
+        #if PERFORMANCE_TEST
+            END_TEST(DIV_TIME)
+        #endif
         return *this;
     }
     
     
     // ========================== Mod and Assign =========================== //    
     uInt& operator%=(const uInt& n) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         uInt curr(0);
         for (auto it = this->bits.rbegin(); it != this->bits.rend(); it++) {
             curr <<= 1;
@@ -292,25 +391,93 @@ class uInt {
         }
         this->bits = curr.bits;
         this->remove_lead_zeros();
+        #if PERFORMANCE_TEST
+            END_TEST(MOD_TIME)
+        #endif
         return *this;
     }
 
 
     // ======================= Left Shift And Assign ======================= //
     uInt& operator<<=(const uint64_t& pos) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (this->bits.size() == 0 || pos == 0) return *this;
         this->bits.insert(this->bits.begin(), pos, false);
+        #if PERFORMANCE_TEST
+            END_TEST(SL_TIME)
+        #endif
         return *this;
     }
 
 
     // ======================= Right Shift And Assign ====================== //
     uInt& operator>>=(const uint64_t& pos) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (this->bits.size() == 0 || pos == 0) return *this;
         this->bits.erase(this->bits.begin(), this->bits.begin() + pos);
+        #if PERFORMANCE_TEST
+            END_TEST(SR_TIME)
+        #endif
         return *this;
     }
 
+
+    // ====================== Bitwise AND And Assign ======================= //
+    uInt& operator&=(const uInt& n) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
+        if (this->bits.size() > n.bits.size())
+            this->bits.resize(n.bits.size(), false);
+        for (uint64_t i = 0; i < this->bits.size(); ++i) {
+            this->bits[i] = this->bits[i] && n.bits[i];
+        }
+        this->remove_lead_zeros();
+        #if PERFORMANCE_TEST
+            END_TEST(AND_TIME)
+        #endif
+        return *this;
+    }
+
+
+    // ======================= Bitwise OR And Assign ======================= //
+    uInt& operator|=(const uInt& n) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
+        if (this->bits.size() < n.bits.size())
+            this->bits.resize(n.bits.size(), false);
+        for (uint64_t i = 0; i < this->bits.size(); ++i) {
+            this->bits[i] = this->bits[i] || n.bits[i];
+        }
+        this->remove_lead_zeros();
+        #if PERFORMANCE_TEST
+            END_TEST(OR_TIME)
+        #endif
+        return *this;
+    }
+
+
+    // ====================== Bitwise XOR And Assign ======================= //
+    uInt& operator^=(const uInt& n) {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
+        if (this->bits.size() < n.bits.size())
+            this->bits.resize(n.bits.size(), false);
+        for (uint64_t i = 0; i < this->bits.size(); ++i) {
+            this->bits[i] = this->bits[i] ^ n.bits[i];
+        }
+        this->remove_lead_zeros();
+        #if PERFORMANCE_TEST
+            END_TEST(XOR_TIME)
+        #endif
+        return *this;
+    }
 
     // ============================= Arithmetic ============================ //
     uInt& operator+(const uInt& n) const {
@@ -360,6 +527,27 @@ class uInt {
         *rsh >>= pos;
         return *rsh;
     }
+
+
+    uInt& operator&(const uInt& n) const {
+        uInt* and_result = new uInt(*this);
+        *and_result &= n;
+        return *and_result;
+    }
+
+
+    uInt& operator|(const uInt& n) const {
+        uInt* or_result = new uInt(*this);
+        *or_result |= n;
+        return *or_result;
+    }
+
+
+    uInt& operator^(const uInt& n) const {
+        uInt* xor_result = new uInt(*this);
+        *xor_result ^= n;
+        return *xor_result;
+    }
     
     
     // ========================== Unary Operators ========================== //
@@ -371,29 +559,43 @@ class uInt {
 
     // =========================== Conditionals ============================ //
     bool operator==(const uInt& n) const {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (this->bits.size() != n.bits.size())
             return false;
         for (uint64_t i = 0; i < this->bits.size(); ++i) {
             if (this->bits[i] ^ n.bits[i])
                 return false;
         }
+        #if PERFORMANCE_TEST
+            END_TEST(EQ_TIME)
+        #endif
         return true;
-
     }
     
     
     bool operator!=(const uInt& n) const {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (this->bits.size() != n.bits.size())
             return true;
         for (uint64_t i = 0; i < this->bits.size(); ++i) {
             if (this->bits[i] ^ n.bits[i])
                 return true;
         }
+        #if PERFORMANCE_TEST
+            END_TEST(NEQ_TIME)
+        #endif
         return false;
     }
     
     
     bool operator<(const uInt& n) const {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (this->bits.size() < n.bits.size())
             return true;
         else if (this->bits.size() > n.bits.size())
@@ -402,11 +604,17 @@ class uInt {
             if (this->bits[i] ^ n.bits[i])
                 return n.bits[i];
         }
+        #if PERFORMANCE_TEST
+            END_TEST(LT_TIME)
+        #endif
         return false;
     }
     
     
     bool operator>(const uInt& n) const {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (this->bits.size() > n.bits.size())
             return true;
         else if (this->bits.size() < n.bits.size())
@@ -415,11 +623,17 @@ class uInt {
             if (this->bits[i] ^ n.bits[i])
                 return this->bits[i];
         }
+        #if PERFORMANCE_TEST
+            END_TEST(GT_TIME)
+        #endif
         return false;
     }
     
     
     bool operator<=(const uInt& n) const {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (this->bits.size() < n.bits.size())
             return true;
         else if (this->bits.size() > n.bits.size())
@@ -428,11 +642,17 @@ class uInt {
             if (this->bits[i] ^ n.bits[i])
                 return n.bits[i];
         }
+        #if PERFORMANCE_TEST
+            END_TEST(LTE_TIME)
+        #endif
         return true;
     }
     
     
     bool operator>=(const uInt& n) const {
+        #if PERFORMANCE_TEST
+            START_TEST()
+        #endif
         if (this->bits.size() > n.bits.size())
             return true;
         else if (this->bits.size() < n.bits.size())
@@ -441,6 +661,9 @@ class uInt {
             if (this->bits[i] ^ n.bits[i])
                 return this->bits[i];
         }
+        #if PERFORMANCE_TEST
+            END_TEST(GTE_TIME)
+        #endif
         return true;
     }
 };
@@ -459,6 +682,9 @@ const uInt NINE = uInt(9);
 const uInt TEN = uInt(10);
 
 std::string uInt::to_string() const {
+    #if PERFORMANCE_TEST
+        START_TEST()
+    #endif
     if (*this == 0) return std::string("0");
     uInt n(*this), mod;
     std::string result("");
@@ -489,7 +715,25 @@ std::string uInt::to_string() const {
             return "";
         }
     }
+    #if PERFORMANCE_TEST
+        END_TEST(UINT_TO_STRING_TIME)
+    #endif
     return result;
+}
+
+
+std::string uInt::to_string(const uint64_t& base) const {
+    std::string result_str;
+    if (base == 2u) {
+        for (auto it = this->bits.rbegin(); it != this->bits.rend(); ++it) {
+            result_str.append(1, *it ? '1' : '0');
+        }
+        return result_str;
+    }
+    if (base == 10u) {
+        return this->to_string();
+    }
+    throw std::runtime_error("ERROR: Unaccepted base");
 }
 
 
@@ -533,8 +777,92 @@ uInt& operator%(const uint64_t& num, const uInt& n) {
 }
 
 
+// ========================== Performance Testing ========================== //
+#if PERFORMANCE_TEST
+void print_performance_test_results() {
+    double total = 0.0;
+    for (auto time : durations) {
+        total += time.count();
+    }
+    std::cout << std::endl << "PERFORMANCE TEST RESULTS" << std::endl;
+    std::cout << "======================================================" << std::endl;
+    for (uint64_t i = 0; i < NUM_OF_TESTS; ++i) {
+        double time = durations[i].count();
+        std::cout << std::setw(27);
+        switch (i) {
+            case REMOVE_LEAD_ZEROS_TIME:
+                std::cout << "REMOVE_LEAD_ZEROS";
+                break;
+            case INT_TO_UINT_TIME:
+                std::cout << "INT TO UINT";
+                break;
+            case STRING_TO_UINT_TIME:
+                std::cout << "STRING TO UINT";
+                break;
+            case COPY_TIME:
+                std::cout << "COPY";
+                break;
+            case ADD_TIME:
+                std::cout << "ADDITION";
+                break;
+            case SUB_TIME:
+                std::cout << "SUBTRACTION";
+                break;
+            case MUL_TIME:
+                std::cout << "MULTIPLICATION";
+                break;
+            case DIV_TIME:
+                std::cout << "DIVISION";
+                break;
+            case MOD_TIME:
+                std::cout << "MODULO";
+                break;
+            case SL_TIME:
+                std::cout << "SHIFT LEFT";
+                break;
+            case SR_TIME:
+                std::cout << "SHIFT RIGHT";
+                break;
+            case AND_TIME:
+                std::cout << "BITWISE AND";
+                break;
+            case OR_TIME:
+                std::cout << "BITWISE OR";
+                break;
+            case XOR_TIME:
+                std::cout << "BITWISE XOR";
+                break;
+            case EQ_TIME:
+                std::cout << "EQUALS";
+                break;
+            case NEQ_TIME:
+                std::cout << "NOT EQUALS";
+                break;
+            case LT_TIME:
+                std::cout << "LESS THAN";
+                break;
+            case GT_TIME:
+                std::cout << "GREATER THAN";
+                break;
+            case LTE_TIME:
+                std::cout << "GREATER THAN OR EQUAL TO";
+                break;
+            case GTE_TIME:
+                std::cout << "LESS THAN OR EQUAL TO";
+                break;
+            case UINT_TO_STRING_TIME:
+                std::cout << "UINT TO STRING";
+                break;
+            default:
+                std::cout << "";
+        }
+        std::cout << " || " << std::setw(8) << time << "ms, " << (time / total * 100) << "%" << std::endl;
+    }
+}
+#endif
+
+
 } // End namespace atn
 
 
 #endif // _UINTEGER_UINT_HPP_
-
