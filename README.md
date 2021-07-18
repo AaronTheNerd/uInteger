@@ -116,7 +116,7 @@ Outputs:
 
 ## Optimization History
 
-> All optimization benchmarks run with fibo_fast(N).
+> All optimization benchmarks are run from `benchmark.cpp`.
 
 First run (7/18/2021):
 ```
