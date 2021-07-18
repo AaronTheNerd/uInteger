@@ -492,16 +492,6 @@ std::string uInt::to_string() const {
     return result;
 }
 
-uInt& uInt::russian_peasant(const uInt& n) {
-    uInt res = ZERO;
-    uInt b_curr = n;
-    while (b_curr.bits.size() != 0) {
-        res += (b_curr.bits.front()) ? *this : ZERO;
-        *this <<= 1;
-        b_curr >>= 1;
-    }
-    this->bits = res.bits;
-}
 
 uInt& uInt::operator++() {
     return *this += ONE;
