@@ -35,5 +35,7 @@ int main(int argc, char** argv) {
     auto stop = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> total = stop - start;
     std::cout << std::endl << "N=" << N << ", Runtime: " << total.count() << "ms" << std::endl;
+    #if PERFORMANCE_TEST
     atn::print_performance_test_results();
+    #endif
 }
