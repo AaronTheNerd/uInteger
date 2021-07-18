@@ -218,6 +218,42 @@ PERFORMANCE TEST RESULTS
 
 **This was a huge step from the original runtime. From approximately 40mins to 30mins**
 
+---
+
+7/18/2021:
+
+Modified `+=` method to reduce the amount of temporary variables created.
+
+```
+43466557686937456435688527675040625802564660517371780402481729089536555417949051890403879840079255169295922593080322634775209689623239873322471161642996440906533187938298969649928516003704476137795166849228875
+
+N=1000, Runtime: 244.106ms
+
+PERFORMANCE TEST RESULTS
+======================================================
+          REMOVE_LEAD_ZEROS ||  13.4317ms, 2.84251%
+                INT TO UINT ||  13.4331ms, 2.84279%
+             STRING TO UINT ||        0ms, 0%
+                       COPY ||  32.4214ms, 6.86123%
+                   ADDITION ||  88.5632ms, 18.7423%
+                SUBTRACTION ||  29.2932ms, 6.19921%
+             MULTIPLICATION ||  142.362ms, 30.1276%
+                   DIVISION ||        0ms, 0%
+                     MODULO || 0.427742ms, 0.0905214%
+                 SHIFT LEFT ||  50.8261ms, 10.7561%
+                SHIFT RIGHT ||        0ms, 0%
+                BITWISE AND ||        0ms, 0%
+                 BITWISE OR ||        0ms, 0%
+                BITWISE XOR ||        0ms, 0%
+                     EQUALS || 0.051688ms, 0.0109385%
+                 NOT EQUALS || 0.000131ms, 2.7723e-05%
+                  LESS THAN ||        0ms, 0%
+               GREATER THAN ||        0ms, 0%
+   GREATER THAN OR EQUAL TO ||  1.10725ms, 0.234324%
+      LESS THAN OR EQUAL TO ||  1.09433ms, 0.23159%
+             UINT TO STRING ||  99.5188ms, 21.0608%
+```
+
 ## Future Work
 
 I would like to spend a lot more time optimizing this project. The largest number calculated was the 100,000th term in the fibonacci sequence. This number was 20,899 decimal digits, however, it took over 30 minutes to perform this calculation. I think a reasonable goal might be to cut down the runtime of this test to 25 minutes.
