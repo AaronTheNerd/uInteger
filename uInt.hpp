@@ -29,6 +29,7 @@
 
 
 #if PERFORMANCE_TEST
+    #include <algorithm>
     #include <iomanip>
     #include <iostream>
     #include <chrono>
@@ -356,7 +357,7 @@ class uInt {
         #endif
         uInt mult(0), shifted_n(n);
         for (uint64_t i = 0; i < this->bits.size(); ++i) {
-            mult += this->bits[i] ? shifted_n : uInt(0);
+            if (this->bits[i]) mult += shifted_n;
             shifted_n <<= 1;
         }
         this->bits = mult.bits;
@@ -808,6 +809,7 @@ uInt& operator%(const uint64_t& num, const uInt& n) {
 #if PERFORMANCE_TEST
 void print_performance_test_results() {
     double total = 0.0;
+    std::sort(durations.begin(), durations.end(), std::greater<TEST_RESOLUTION>());
     for (auto time : durations) {
         total += time.count();
     }
