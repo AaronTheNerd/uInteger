@@ -354,9 +354,10 @@ class uInt {
         #if PERFORMANCE_TEST
             START_TEST(MUL_TIME)
         #endif
-        uInt mult(0);
+        uInt mult(0), shifted_n(n);
         for (uint64_t i = 0; i < this->bits.size(); ++i) {
-            if (this->bits[i]) mult += (n << i);
+            mult += this->bits[i] ? shifted_n : uInt(0);
+            shifted_n <<= 1;
         }
         this->bits = mult.bits;
         #if PERFORMANCE_TEST
