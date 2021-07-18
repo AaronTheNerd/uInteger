@@ -116,7 +116,7 @@ Outputs:
 
 ## Optimization History
 
-> All optimization benchmarks are run from `benchmark.cpp`.
+> All optimization benchmarks are run from `benchmark.cpp`. With a -O0 optimization flag.
 
 First run (7/18/2021):
 ```
