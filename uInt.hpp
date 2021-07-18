@@ -40,6 +40,7 @@ namespace atn { // AaronTheNerd
 
 #if PERFORMANCE_TEST
     #define TEST_RESOLUTION std::chrono::duration<double, std::milli>
+    #define CLOCK std::chrono::high_resolution_clock
     enum {
         REMOVE_LEAD_ZEROS_TIME,
         INT_TO_UINT_TIME,
@@ -64,15 +65,15 @@ namespace atn { // AaronTheNerd
         UINT_TO_STRING_TIME,
         NUM_OF_TESTS
     };
+    std::vector<std::chrono::time_point<CLOCK>> start_times(NUM_OF_TESTS);
     std::vector<TEST_RESOLUTION> durations(NUM_OF_TESTS);
-    auto start = std::chrono::high_resolution_clock::now();
-    auto stop = std::chrono::high_resolution_clock::now(); 
-    auto duration = stop - start;
-    #define START_TEST() \
-        start = std::chrono::high_resolution_clock::now();
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = stop - stop;
+    #define START_TEST(x) \
+        start_times[x] = CLOCK::now();
     #define END_TEST(x) \
-        stop = std::chrono::high_resolution_clock::now(); \
-        duration = stop - start; \
+        stop = CLOCK::now(); \
+        duration = stop - start_times[x]; \
         durations[x] += duration;
     #endif
 
@@ -83,9 +84,31 @@ class uInt {
 
   private:
     // ========================== Helper Methods =========================== //
+    std::pair<std::vector<bool>, std::vector<bool>> div_and_mod(const uInt& n) const {
+        if (n == 0) {
+            throw std::runtime_error("ERROR: Divide/Mod by 0 Exception");
+        }
+        if (this->bits.size() == 0) {
+            return std::make_pair(this->bits, this->bits);
+        }
+        uInt quotient(*this), mod(0);
+        for (auto it = quotient.bits.rbegin(); it != quotient.bits.rend(); it++) {
+            mod <<= 1;
+            if (*it) ++mod;
+            if (mod >= n) {
+                *it = true;
+                mod -= n;
+            } else {
+                *it = false;
+            }
+        }
+        mod.remove_lead_zeros();
+        quotient.remove_lead_zeros();
+        return std::make_pair(quotient.bits, mod.bits);
+    }
     void remove_lead_zeros() {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(REMOVE_LEAD_ZEROS_TIME)
         #endif
         while (!this->bits.back() && this->bits.size() != 0)
         this->bits.pop_back();
@@ -211,7 +234,7 @@ class uInt {
     uInt(const uint64_t& num) 
             : bits(std::vector<bool>()) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(INT_TO_UINT_TIME)
         #endif
         uint64_t ull_size = sizeof(uint64_t) * CHAR_BIT;
         for (uint64_t i = 0; i < ull_size; ++i) {
@@ -225,7 +248,7 @@ class uInt {
     explicit uInt(const std::string& str) 
             : bits(std::vector<bool>()) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(STRING_TO_UINT_TIME)
         #endif
         if (str.size() == 0) {
             this->bits.clear();
@@ -251,7 +274,7 @@ class uInt {
     }
     uInt(const uInt& n) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(COPY_TIME)
         #endif
         if (this != &n) {
             this->bits.resize(n.bits.size(), false);
@@ -272,7 +295,7 @@ class uInt {
     // ========================== Add and Assign =========================== //
     uInt& operator+=(const uInt& n) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(ADD_TIME)
         #endif
         bool n1 = 0, n2 = 0, carry = 0;
         if (this->bits.size() < n.bits.size()) {
@@ -296,7 +319,7 @@ class uInt {
     // ========================= Minus and Assign ========================== //
     uInt& operator-=(const uInt& n) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(SUB_TIME)
         #endif
         if (*this <= n) {
             this->bits.clear();
@@ -329,7 +352,7 @@ class uInt {
     // ======================== Multiply and Assign ======================== //
     uInt& operator*=(const uInt& n) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(MUL_TIME)
         #endif
         uInt mult(0);
         for (uint64_t i = 0; i < this->bits.size(); ++i) {
@@ -346,7 +369,7 @@ class uInt {
     // ========================= Divide and Assign ========================= //    
     uInt& operator/=(const uInt& n) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(DIV_TIME)
         #endif
         if (n == 0) {
             throw std::runtime_error("ERROR: Divide by 0 Exception");
@@ -376,7 +399,7 @@ class uInt {
     // ========================== Mod and Assign =========================== //    
     uInt& operator%=(const uInt& n) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(MOD_TIME)
         #endif
         uInt curr(0);
         for (auto it = this->bits.rbegin(); it != this->bits.rend(); it++) {
@@ -401,7 +424,7 @@ class uInt {
     // ======================= Left Shift And Assign ======================= //
     uInt& operator<<=(const uint64_t& pos) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(SL_TIME)
         #endif
         if (this->bits.size() == 0 || pos == 0) return *this;
         this->bits.insert(this->bits.begin(), pos, false);
@@ -415,7 +438,7 @@ class uInt {
     // ======================= Right Shift And Assign ====================== //
     uInt& operator>>=(const uint64_t& pos) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(SR_TIME)
         #endif
         if (this->bits.size() == 0 || pos == 0) return *this;
         this->bits.erase(this->bits.begin(), this->bits.begin() + pos);
@@ -429,7 +452,7 @@ class uInt {
     // ====================== Bitwise AND And Assign ======================= //
     uInt& operator&=(const uInt& n) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(AND_TIME)
         #endif
         if (this->bits.size() > n.bits.size())
             this->bits.resize(n.bits.size(), false);
@@ -447,7 +470,7 @@ class uInt {
     // ======================= Bitwise OR And Assign ======================= //
     uInt& operator|=(const uInt& n) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(OR_TIME)
         #endif
         if (this->bits.size() < n.bits.size())
             this->bits.resize(n.bits.size(), false);
@@ -465,7 +488,7 @@ class uInt {
     // ====================== Bitwise XOR And Assign ======================= //
     uInt& operator^=(const uInt& n) {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(XOR_TIME)
         #endif
         if (this->bits.size() < n.bits.size())
             this->bits.resize(n.bits.size(), false);
@@ -560,7 +583,7 @@ class uInt {
     // =========================== Conditionals ============================ //
     bool operator==(const uInt& n) const {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(EQ_TIME)
         #endif
         if (this->bits.size() != n.bits.size())
             return false;
@@ -577,7 +600,7 @@ class uInt {
     
     bool operator!=(const uInt& n) const {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(NEQ_TIME)
         #endif
         if (this->bits.size() != n.bits.size())
             return true;
@@ -594,7 +617,7 @@ class uInt {
     
     bool operator<(const uInt& n) const {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(LT_TIME)
         #endif
         if (this->bits.size() < n.bits.size())
             return true;
@@ -613,7 +636,7 @@ class uInt {
     
     bool operator>(const uInt& n) const {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(GT_TIME)
         #endif
         if (this->bits.size() > n.bits.size())
             return true;
@@ -632,7 +655,7 @@ class uInt {
     
     bool operator<=(const uInt& n) const {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(LTE_TIME)
         #endif
         if (this->bits.size() < n.bits.size())
             return true;
@@ -651,7 +674,7 @@ class uInt {
     
     bool operator>=(const uInt& n) const {
         #if PERFORMANCE_TEST
-            START_TEST()
+            START_TEST(GTE_TIME)
         #endif
         if (this->bits.size() > n.bits.size())
             return true;
@@ -681,16 +704,19 @@ const uInt EIGHT = uInt(8);
 const uInt NINE = uInt(9);
 const uInt TEN = uInt(10);
 
+
+
 std::string uInt::to_string() const {
     #if PERFORMANCE_TEST
-        START_TEST()
+        START_TEST(UINT_TO_STRING_TIME)
     #endif
     if (*this == 0) return std::string("0");
     uInt n(*this), mod;
     std::string result("");
     while (n != ZERO) {
-        mod = n % TEN;
-        n /= TEN;
+        std::pair<std::vector<bool>, std::vector<bool>> div_mod_result = n.div_and_mod(TEN);
+        mod.bits = div_mod_result.second;
+        n.bits = div_mod_result.first;
         if (mod == ZERO)
             result = '0' + result;
         else if (mod == ONE)
