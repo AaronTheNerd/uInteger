@@ -60,7 +60,7 @@ Ouput:
 
 ## Operators
 
-Excluded operators: `&&`, `||`, `!`, `&`, `|`, `^`, `~`. All other operators are fully implemented and are implemented to be identical as a traditional integer.
+Excluded operators: `&&`, `||`, `!`, `~`. All other operators are fully implemented and are implemented to be identical as a traditional integer.
 
 ## Class methods
 
