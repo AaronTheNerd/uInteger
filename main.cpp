@@ -1,5 +1,6 @@
 #include "uInt.hpp"
 #include <cstdlib>
+#include <chrono>
 #include <iostream>
 void test() {
     srand(0);
@@ -26,6 +27,12 @@ void test() {
     std::cout << i << std::endl;
     atn::uInt j("31415926535897932384626433"); // 31415926535897932384626433
     std::cout << j << std::endl;
+    atn::uInt k = a & b; // 571146566
+    std::cout << k << std::endl;
+    atn::uInt l = a | b; // 2080073703
+    std::cout << l << std::endl;
+    atn::uInt m = a ^ b; // 1508927137
+    std::cout << m << std::endl;
 }
 void test_iter(uint64_t n) {
     atn::uInt curr;
@@ -75,13 +82,13 @@ void fibo_fast(uint64_t n) {
     fibo_fast(n, res);
     std::cout << res[0] << std::endl;
 }
-void russian_peasant_test() {
-    atn::uInt n1(10), n2(30853);
-    atn::uInt n3 = n1.russian_peasant(n2);
-    std::cout << n3 << std::endl;
-}
+#define N 1000
 int main(int argc, char** argv) {
-    //fibo_fast(15000);
+    auto start = std::chrono::high_resolution_clock::now();
+    fibo_fast(N);
+    auto stop = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> total = stop - start;
+    std::cout << std::endl << "N=" << N << ", Runtime: " << total.count() << "ms" << std::endl;
     //test();
-    russian_peasant_test();
+    atn::print_performance_test_results();
 }
