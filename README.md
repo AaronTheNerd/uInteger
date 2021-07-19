@@ -134,6 +134,7 @@ First run (7/18/2021):
 354224848179261915075
 
 N=100, Runtime: 0.584474ms
+Decimal digits: 21, Binary digits: 69
 
 PERFORMANCE TEST RESULTS
 ======================================================

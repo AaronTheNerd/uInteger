@@ -1,0 +1,28 @@
+354224848179261915075
+
+N=100, Runtime: 0.801668ms
+Decimal digits: 21, Binary digits: 69
+
+PERFORMANCE TEST RESULTS
+======================================================
+          REMOVE_LEAD_ZEROS || 0.062833ms, 5.27682%
+                INT TO UINT || 0.088869ms, 7.46337%
+             STRING TO UINT ||        0ms, 0%
+                       COPY || 0.046293ms, 3.88777%
+                   ADDITION || 0.083405ms, 7.0045%
+                SUBTRACTION || 0.097881ms, 8.22022%
+             MULTIPLICATION || 0.168806ms, 14.1766%
+                   DIVISION ||        0ms, 0%
+                     MODULO || 0.023709ms, 1.99112%
+                 SHIFT LEFT || 0.137697ms, 11.564%
+                SHIFT RIGHT ||        0ms, 0%
+                BITWISE AND ||        0ms, 0%
+                 BITWISE OR ||        0ms, 0%
+                BITWISE XOR ||        0ms, 0%
+                     EQUALS || 0.002944ms, 0.247242%
+                 NOT EQUALS || 0.000125ms, 0.0104977%
+                  LESS THAN ||        0ms, 0%
+               GREATER THAN ||        0ms, 0%
+   GREATER THAN OR EQUAL TO || 0.003475ms, 0.291837%
+      LESS THAN OR EQUAL TO || 0.003413ms, 0.28663%
+             UINT TO STRING || 0.471285ms, 39.5793%
