@@ -29,7 +29,6 @@
 
 
 #if PERFORMANCE_TEST
-    #include <algorithm>
     #include <iomanip>
     #include <iostream>
     #include <chrono>
@@ -332,13 +331,18 @@ class uInt {
             n2 = (i >= n.bits.size()) ? false : n.bits[i];
             this->bits[i] = n1 ^ n2;
             if (n2 && !n1) {
-                for (uint64_t j = i + 1; j < this->bits.size(); ++j) {
+                uint64_t j;
+                for (j = i + 1; j < this->bits.size(); ++j) {
                     if (this->bits[j]) {
                         this->bits[j] = false;
                         break;
                     } else {
                         this->bits[j] = true;
                     }
+                }
+                if (j == this->bits.size()) {
+                    this->bits.clear();
+                    return *this;
                 }
             }
         }
@@ -809,7 +813,6 @@ uInt& operator%(const uint64_t& num, const uInt& n) {
 #if PERFORMANCE_TEST
 void print_performance_test_results() {
     double total = 0.0;
-    std::sort(durations.begin(), durations.end(), std::greater<TEST_RESOLUTION>());
     for (auto time : durations) {
         total += time.count();
     }
