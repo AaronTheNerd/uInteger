@@ -6,7 +6,7 @@
 Simply include the `uInt.hpp` file to use the `uInt` class. Note that the uInteger class is contained within the `atn` namespace. 
 
 ```
-#include "uInt.hpp"
+#include "../src/uInt.hpp"
 #include <iostream>
 
 int main(int argc, char** argv) {
@@ -32,7 +32,7 @@ copy(4)     | `uInt(const uInt& n);`
 
 Example:
 ```
-#include "uInt.hpp"
+#include "../src/uInt.hpp"
 #include <iostream>
 
 int main(int argc, char** argv) {
@@ -68,7 +68,7 @@ Currently there is only one class method which is not an overloaded operator: `s
 
 ## Examples:
 ```
-#include "uInt.hpp"
+#include "../src/uInt.hpp"
 #include <iostream>
 
 int main(int argc, char** argv) {
@@ -113,6 +113,17 @@ Outputs:
 14434315064
 225536172
 ```
+
+## Testing
+
+Random Unit Test:\
+`make random_unit_tests N={num_of_tests}`
+
+Set Seed Unit Test:\
+`make set_unit_tests SEED={seed} N={num_of_tests}`
+
+Benchmark Test:\
+`make benchmark N={fibonacci_index}`
 
 ## Optimization History
 
