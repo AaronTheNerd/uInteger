@@ -1,28 +1,28 @@
 354224848179261915075
 
-N=100, Runtime: 0.801668ms
+N=100, Runtime: 0.572102ms
 Decimal digits: 21, Binary digits: 69
 
 PERFORMANCE TEST RESULTS
 ======================================================
-          REMOVE_LEAD_ZEROS || 0.062833ms, 5.27682%
-                INT TO UINT || 0.088869ms, 7.46337%
+          REMOVE_LEAD_ZEROS || 0.042055ms, 5.12038%
+                INT TO UINT || 0.059662ms, 7.26412%
              STRING TO UINT ||        0ms, 0%
-                       COPY || 0.046293ms, 3.88777%
-                   ADDITION || 0.083405ms, 7.0045%
-                SUBTRACTION || 0.097881ms, 8.22022%
-             MULTIPLICATION || 0.168806ms, 14.1766%
+                       COPY || 0.037249ms, 4.53523%
+                   ADDITION ||  0.05731ms, 6.97775%
+                SUBTRACTION ||  0.06735ms, 8.20016%
+             MULTIPLICATION || 0.115286ms, 14.0366%
                    DIVISION ||        0ms, 0%
-                     MODULO || 0.023709ms, 1.99112%
-                 SHIFT LEFT || 0.137697ms, 11.564%
+                     MODULO || 0.015827ms, 1.92701%
+                 SHIFT LEFT || 0.094861ms, 11.5498%
                 SHIFT RIGHT ||        0ms, 0%
                 BITWISE AND ||        0ms, 0%
                  BITWISE OR ||        0ms, 0%
                 BITWISE XOR ||        0ms, 0%
-                     EQUALS || 0.002944ms, 0.247242%
-                 NOT EQUALS || 0.000125ms, 0.0104977%
+                     EQUALS || 0.002121ms, 0.258241%
+                 NOT EQUALS ||  9.8e-05ms, 0.0119319%
                   LESS THAN ||        0ms, 0%
                GREATER THAN ||        0ms, 0%
-   GREATER THAN OR EQUAL TO || 0.003475ms, 0.291837%
-      LESS THAN OR EQUAL TO || 0.003413ms, 0.28663%
-             UINT TO STRING || 0.471285ms, 39.5793%
+   GREATER THAN OR EQUAL TO ||  0.00233ms, 0.283688%
+      LESS THAN OR EQUAL TO || 0.002383ms, 0.290141%
+             UINT TO STRING || 0.324793ms, 39.545%
