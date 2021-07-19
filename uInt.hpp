@@ -112,7 +112,7 @@ class uInt {
             START_TEST(REMOVE_LEAD_ZEROS_TIME)
         #endif
         while (!this->bits.back() && this->bits.size() != 0)
-        this->bits.pop_back();
+            this->bits.pop_back();
         #if PERFORMANCE_TEST
             END_TEST(REMOVE_LEAD_ZEROS_TIME)
         #endif
