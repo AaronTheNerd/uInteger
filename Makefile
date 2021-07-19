@@ -6,3 +6,6 @@ N = 100
 benchmark: benchmark.cpp
 	$(CC) $(CFLAGS) benchmark.cpp
 	./run $(N) > benchmark.txt
+
+clean:
+	rm *.out run benchmark.txt
