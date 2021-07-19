@@ -20,4 +20,4 @@ set_unit_tests: tests/unit_tests.cpp src/uInt.hpp
 tests : benchmark random_unit_tests
 
 clean:
-	rm *.out run data/benchmark.txt
+	rm *.out run
