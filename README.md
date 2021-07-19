@@ -96,7 +96,14 @@ int main(int argc, char** argv) {
     std::cout << i << std::endl;
     atn::uInt j = a >> 3; // 225536172
     std::cout << j << std::endl;
+    atn::uInt k = a & b; // 571146566
+    std::cout << k << std::endl;
+    atn::uInt l = a | b; // 2080073703
+    std::cout << l << std::endl;
+    atn::uInt m = a ^ b; // 1508927137
+    std::cout << m << std::endl;
 }
+
 ```
 
 Outputs: 
