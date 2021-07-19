@@ -121,23 +121,52 @@ bool test_mod(uint64_t n1, uint64_t n2) {
     return true;
 }
 
-bool test_shift_left() {
+bool test_shift_left(uint64_t n) {
+    atn::uInt u = n;
+    TEST("TEST_SL", 1, (u << 0).to_string(), std::to_string(n << 0))
+    TEST("TEST_SL", 2, (u << 1).to_string(), std::to_string(n << 1))
+    TEST("TEST_SL", 3, (u << 2).to_string(), std::to_string(n << 2))
     return true;
 }
 
-bool test_shift_right() {
+bool test_shift_right(uint64_t n) {
+    atn::uInt u = n;
+    TEST("TEST_SR", 1, (u >> 0).to_string(), std::to_string(n >> 0))
+    TEST("TEST_SR", 2, (u >> 1).to_string(), std::to_string(n >> 1))
+    TEST("TEST_SR", 3, (u >> 2).to_string(), std::to_string(n >> 2))
     return true;
 }
 
-bool test_and() {
+bool test_and(uint64_t n1, uint64_t n2) {
+    atn::uInt u1 = n1, u2 = n2;
+    TEST("TEST_AND", 1, (u1 & u2).to_string(), std::to_string(n1 & n2))
+    TEST("TEST_AND", 2, (u2 & u1).to_string(), std::to_string(n2 & n1))
+    TEST("TEST_AND", 3, (u1 & 1).to_string(), std::to_string(n1 & 1))
+    TEST("TEST_AND", 4, (u2 & 1).to_string(), std::to_string(n2 & 1))
+    TEST("TEST_AND", 5, (u1 & 0).to_string(), std::to_string(n1 & 0))
+    TEST("TEST_AND", 6, (u2 & 0).to_string(), std::to_string(n2 & 0))
     return true;
 }
 
-bool test_or() {
+bool test_or(uint64_t n1, uint64_t n2) {
+    atn::uInt u1 = n1, u2 = n2;
+    TEST("TEST_OR", 1, (u1 | u2).to_string(), std::to_string(n1 | n2))
+    TEST("TEST_OR", 2, (u2 | u1).to_string(), std::to_string(n2 | n1))
+    TEST("TEST_OR", 3, (u1 | 1).to_string(), std::to_string(n1 | 1))
+    TEST("TEST_OR", 4, (u2 | 1).to_string(), std::to_string(n2 | 1))
+    TEST("TEST_OR", 5, (u1 | 0).to_string(), std::to_string(n1 | 0))
+    TEST("TEST_OR", 6, (u2 | 0).to_string(), std::to_string(n2 | 0))
     return true;
 }
 
-bool test_xor() {
+bool test_xor(uint64_t n1, uint64_t n2) {
+    atn::uInt u1 = n1, u2 = n2;
+    TEST("TEST_XOR", 1, (u1 ^ u2).to_string(), std::to_string(n1 ^ n2))
+    TEST("TEST_XOR", 2, (u2 ^ u1).to_string(), std::to_string(n2 ^ n1))
+    TEST("TEST_XOR", 3, (u1 ^ 1).to_string(), std::to_string(n1 ^ 1))
+    TEST("TEST_XOR", 4, (u2 ^ 1).to_string(), std::to_string(n2 ^ 1))
+    TEST("TEST_XOR", 5, (u1 ^ 0).to_string(), std::to_string(n1 ^ 0))
+    TEST("TEST_XOR", 6, (u2 ^ 0).to_string(), std::to_string(n2 ^ 0))
     return true;
 }
 
@@ -210,7 +239,13 @@ bool test_all(uint64_t n1, uint64_t n2) {
     result &= test_mul(n1, n2);
     result &= test_div(n1, n2);
     result &= test_mod(n1, n2);
-    
+    result &= test_shift_left(n1);
+    result &= test_shift_left(n2);
+    result &= test_shift_right(n1);
+    result &= test_shift_right(n2);
+    result &= test_and(n1, n2);
+    result &= test_or(n1, n2);
+    result &= test_xor(n1, n2);
     result &= test_eq(n1, n2);
     result &= test_neq(n1, n2);
     result &= test_lt(n1, n2);
@@ -235,19 +270,17 @@ int main(int argc, char** argv) {
         SEED = std::stoi(argv[2]);
     }
     srand(SEED);
-    bool result = true;
     std::cout << "SEED=" << SEED << ", N=" << N << std::endl << std::endl;
     for (uint64_t i = 0; i < N; ++i) {
         uint64_t rand1 = rand();
         uint64_t rand2 = rand();
         std::cout << "=======================================" << std::endl;
         std::cout << "RUN #" << (i + 1) << ", n1=" << rand1 << ", n2=" << rand2 << std::endl;
-        result &= test_all(rand1, rand2);
+        bool result = test_all(rand1, rand2);
         std::cout << "=======================================" << std::endl << std::endl;
+        if (!result) {
+            throw std::runtime_error("TEST #" + std::to_string(i + 1) + " HAS FAILED");
+        }
     }
-    if (result) {
-        std::cout << "ALL TESTS SUCCEEDED" << std::endl;
-    } else {
-        std::cout << "SOME TESTS FAILED" << std::endl;
-    }
+    std::cout << "ALL TESTS SUCCEEDED" << std::endl;
 }
