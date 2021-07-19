@@ -1,7 +1,10 @@
 #include "../src/uInt.hpp"
+#include <bitset>
+#include <iomanip>
 #include <iostream>
 #include <numeric>
 #include <string>
+#include <sstream>
 #include <time.h>
 
 
@@ -18,17 +21,30 @@ bool test_int_init(uint64_t n) {
     return true;
 }
 
-bool test_decimal_string_init() {
+bool test_decimal_string_init(uint64_t n) {
+    std::string str = std::to_string(n);
+    atn::uInt u(str);
+    TEST("TEST_DECIMAL_STRING_INIT", 1, u.to_string(), str)
     return true;
 }
 
-bool test_hexadecimal_string_init() {
-    atn::uInt u("0xAaBbCcDdEeFf1234567890");
-    TEST("TEST_HEXADECIMAL_STRING_INIT", 1, u.to_string(), "206404250994574400595327120")
+bool test_hexadecimal_string_init(uint64_t n) {
+    std::stringstream stream;
+    stream << std::hex << n;
+    atn::uInt u("0x" + stream.str());
+    TEST("TEST_HEXADECIMAL_STRING_INIT", 1, u.to_string(), std::to_string(n))
+    u = atn::uInt("0X" + stream.str());
+    TEST("TEST_HEXADECIMAL_STRING_INIT", 2, u.to_string(), std::to_string(n))
     return true;
 }
 
-bool test_binary_string_init() {
+bool test_binary_string_init(uint64_t n) {
+    std::stringstream stream;
+    stream << std::bitset<64>(n);
+    atn::uInt u("0b" + stream.str());
+    TEST("TEST_BINARY_STRING_INIT", 1, u.to_string(), std::to_string(n))
+    u = atn::uInt("0B" + stream.str());
+    TEST("TEST_BINARY_STRING_INIT", 2, u.to_string(), std::to_string(n))
     return true;
 }
 
@@ -72,15 +88,36 @@ bool test_sub(uint64_t n1, uint64_t n2) {
     return true;
 }
 
-bool test_mul() {
+bool test_mul(uint64_t n1, uint64_t n2) {
+    atn::uInt u1 = n1, u2 = n2;
+    TEST("TEST_MUL", 1, (u1 * u2).to_string(), std::to_string(n1 * n2))
+    TEST("TEST_MUL", 2, (u2 * u1).to_string(), std::to_string(n2 * n1))
+    TEST("TEST_MUL", 3, (u1 * 1).to_string(), std::to_string(n1 * 1))
+    TEST("TEST_MUL", 4, (u2 * 1).to_string(), std::to_string(n2 * 1))
+    TEST("TEST_MUL", 5, (u1 * 0).to_string(), std::to_string(n1 * 0))
+    TEST("TEST_MUL", 6, (u2 * 0).to_string(), std::to_string(n2 * 0))
     return true;
 }
 
-bool test_div() {
+bool test_div(uint64_t n1, uint64_t n2) {
+    atn::uInt u1 = n1, u2 = n2;
+    TEST("TEST_DIV", 1, (u1 / u2).to_string(), std::to_string(n1 / n2))
+    TEST("TEST_DIV", 2, (u2 / u1).to_string(), std::to_string(n2 / n1))
+    TEST("TEST_DIV", 3, (u1 / 1).to_string(), std::to_string(n1 / 1))
+    TEST("TEST_DIV", 4, (u2 / 1).to_string(), std::to_string(n2 / 1))
+    TEST("TEST_DIV", 5, (0 / u1).to_string(), std::to_string(0 / n1))
+    TEST("TEST_DIV", 6, (0 / u2).to_string(), std::to_string(0 / n2))
     return true;
 }
 
-bool test_mod() {
+bool test_mod(uint64_t n1, uint64_t n2) {
+    atn::uInt u1 = n1, u2 = n2;
+    TEST("TEST_MOD", 1, (u1 % u2).to_string(), std::to_string(n1 % n2))
+    TEST("TEST_MOD", 2, (u2 % u1).to_string(), std::to_string(n2 % n1))
+    TEST("TEST_MOD", 3, (u1 % 1).to_string(), std::to_string(n1 % 1))
+    TEST("TEST_MOD", 4, (u2 % 1).to_string(), std::to_string(n2 % 1))
+    TEST("TEST_MOD", 5, (0 % u1).to_string(), std::to_string(0 % n1))
+    TEST("TEST_MOD", 6, (0 % u2).to_string(), std::to_string(0 % n2))
     return true;
 }
 
@@ -158,15 +195,22 @@ bool test_gte(uint64_t n1, uint64_t n2) {
     return true;
 }
 
-void test_all(uint64_t n1, uint64_t n2) {
+bool test_all(uint64_t n1, uint64_t n2) {
     bool result = true;
     result &= test_int_init(n1);
     result &= test_int_init(n2);
-
-    result &= test_hexadecimal_string_init();
+    result &= test_decimal_string_init(n1);
+    result &= test_decimal_string_init(n2);
+    result &= test_hexadecimal_string_init(n1);
+    result &= test_hexadecimal_string_init(n2);
+    result &= test_binary_string_init(n1);
+    result &= test_binary_string_init(n2);
     result &= test_add(n1, n2);
     result &= test_sub(n1, n2);
-
+    result &= test_mul(n1, n2);
+    result &= test_div(n1, n2);
+    result &= test_mod(n1, n2);
+    
     result &= test_eq(n1, n2);
     result &= test_neq(n1, n2);
     result &= test_lt(n1, n2);
@@ -178,6 +222,7 @@ void test_all(uint64_t n1, uint64_t n2) {
     } else {
         std::cout << "All test cases succeeded" << std::endl;
     }
+    return result;
 }
 
 int main(int argc, char** argv) {
@@ -190,11 +235,19 @@ int main(int argc, char** argv) {
         SEED = std::stoi(argv[2]);
     }
     srand(SEED);
-    std::cout << "SEED=" << SEED << ", N=" << N << std::endl;
+    bool result = true;
+    std::cout << "SEED=" << SEED << ", N=" << N << std::endl << std::endl;
     for (uint64_t i = 0; i < N; ++i) {
         uint64_t rand1 = rand();
         uint64_t rand2 = rand();
+        std::cout << "=======================================" << std::endl;
         std::cout << "RUN #" << (i + 1) << ", n1=" << rand1 << ", n2=" << rand2 << std::endl;
-        test_all(rand1, rand2);
+        result &= test_all(rand1, rand2);
+        std::cout << "=======================================" << std::endl << std::endl;
+    }
+    if (result) {
+        std::cout << "ALL TESTS SUCCEEDED" << std::endl;
+    } else {
+        std::cout << "SOME TESTS FAILED" << std::endl;
     }
 }
