@@ -12,7 +12,7 @@
 
 // New Goal:
 // Optimize this implementation until I can calculate the fibonacci sequence at
-// 100,000 in under 10 mins
+// 100,000 in under 1 min with optimization flag -O3
 
 
 #ifndef _UINTEGER_UINT_HPP_
