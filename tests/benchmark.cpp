@@ -21,10 +21,10 @@ void fibo_fast(uint64_t n, atn::uInt res[]) {
     }
 }
 
-void fibo_fast(uint64_t n) {
+atn::uInt fibo_fast(uint64_t n) {
     atn::uInt res[2] = { 0 };
     fibo_fast(n, res);
-    std::cout << res[0] << std::endl;
+    return res[0];
 }
 
 int main(int argc, char** argv) {
@@ -33,10 +33,13 @@ int main(int argc, char** argv) {
         N = std::stoi(argv[1]);
     }
     auto start = std::chrono::high_resolution_clock::now();
-    fibo_fast(N);
+    atn::uInt n = fibo_fast(N);
+    std::string str = n.to_string();
+    std::cout << str << std::endl;
     auto stop = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> total = stop - start;
     std::cout << std::endl << "N=" << N << ", Runtime: " << total.count() << "ms" << std::endl;
+    std::cout << "Decimal digits: " << str.size() << ", Binary digits: " << n.bits.size() << std::endl;
     #if PERFORMANCE_TEST
     atn::print_performance_test_results();
     #endif
