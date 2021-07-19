@@ -3,7 +3,7 @@
 
 ## Usage
 
-Simply include the `uInt.hpp` file to use the `uInt` class. Note that the uInteger class is contained within the `atn` namespace. 
+Simply include the `uInt.hpp` file to use the `uInt` class. Note that the `uInt` class is contained within the `atn` namespace. 
 
 ```
 #include "../src/uInt.hpp"
@@ -60,7 +60,7 @@ Ouput:
 
 ## Operators
 
-Excluded operators: `&&`, `||`, `!`, `~`. All other operators are fully implemented and are implemented to be identical as a traditional integer.
+Excluded operators: `&&`, `||`, `!`, `~`. All other operators are fully implemented and are implemented to be identical to a traditional integer. The main difference is that the operator `-` returns 0 when the operator would traditionally overflow. Additionally, the `~` operator isn't implemented as I feel that the operator would be too different to the traditional integer and the results of the operator would be deceptive i.e. `~~n` would not equal `n`.
 
 ## Class methods
 
@@ -119,9 +119,15 @@ Outputs:
 0
 14434315064
 225536172
+571146566
+2080073703
+1508927137
 ```
 
 ## Testing
+
+Run Benchmark and Random Unit Tests:\
+`make tests N={num_of_tests}`
 
 Random Unit Test:\
 `make random_unit_tests N={num_of_tests}`
