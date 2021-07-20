@@ -2,7 +2,7 @@
 // Copyright 2020
 
 
-// The Goal: NEEDS TO BE TESTED
+// The Goal:
 // Implement an unsigned Integer class with arbitrary precision. Also this may
 // not be considered arbitrary technically. This is because it'll have an upper
 // limit depending on the maximum size of a vector. However, as
@@ -10,9 +10,10 @@
 // a large maximum limit. This could allow for potentially 100's of thousands
 // of bits per uInt.
 
+
 // New Goal:
 // Optimize this implementation until I can calculate the fibonacci sequence at
-// 100,000 in under 1 min with optimization flag -O3
+// 100,000 in under 2 mins with optimization flag -O3
 
 
 #ifndef _UINTEGER_UINT_HPP_
@@ -23,6 +24,7 @@
 
 
 #include <climits> // CHAR_BIT
+#include <numeric> // std::accumulate
 #include <stdexcept> // runtime_error
 #include <string> // std::string
 #include <vector> // std::vector
@@ -36,6 +38,10 @@
 
 
 namespace atn { // AaronTheNerd
+
+
+static const std::string base64_index("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
+static const std::string base_n_index("0123456789abcdefghijklmnopqrstuvwxyz");
 
 
 #if PERFORMANCE_TEST
@@ -84,12 +90,12 @@ class uInt {
 
   private:
     // ========================== Helper Methods =========================== //
-    std::pair<std::vector<bool>, std::vector<bool>> div_and_mod(const uInt& n) const {
+    std::pair<uInt, uInt> div_and_mod(const uInt& n) const {
         if (n == 0) {
             throw std::runtime_error("ERROR: Divide/Mod by 0 Exception");
         }
         if (this->bits.size() == 0) {
-            return std::make_pair(this->bits, this->bits);
+            return std::make_pair(*this, *this);
         }
         uInt quotient(*this), mod(0);
         for (auto it = quotient.bits.rbegin(); it != quotient.bits.rend(); it++) {
@@ -104,7 +110,7 @@ class uInt {
         }
         mod.remove_lead_zeros();
         quotient.remove_lead_zeros();
-        return std::make_pair(quotient.bits, mod.bits);
+        return std::make_pair(quotient, mod);
     }
     void remove_lead_zeros() {
         #if PERFORMANCE_TEST
@@ -131,7 +137,7 @@ class uInt {
     }
 
 
-    // =================== Hexidecimal String Conversion =================== //
+    // =================== Hexadecimal String Conversion =================== //
     void convert_hex_string(std::string str) {
         for (auto it = str.rbegin(); it != str.rend(); ++it) {
             switch (*it) {
@@ -359,7 +365,7 @@ class uInt {
         #if PERFORMANCE_TEST
             START_TEST(MUL_TIME)
         #endif
-        uInt mult(0), shifted_n(n);
+        uInt mult, shifted_n(n);
         for (uint64_t i = 0; i < this->bits.size(); ++i) {
             if (this->bits[i]) mult += shifted_n;
             shifted_n <<= 1;
@@ -695,6 +701,11 @@ class uInt {
         #endif
         return true;
     }
+
+
+    explicit operator uint64_t() const {
+        return std::accumulate(this->bits.rbegin(), this->bits.rend(), 0ull, [](unsigned long long x, bool y) { return (x << 1) + y; });
+    }
 };
 
 
@@ -716,13 +727,13 @@ std::string uInt::to_string() const {
     #if PERFORMANCE_TEST
         START_TEST(UINT_TO_STRING_TIME)
     #endif
-    if (*this == 0) return std::string("0");
+    if (*this == ZERO) return std::string("0");
     uInt n(*this), mod;
     std::string result("");
     while (n != ZERO) {
-        std::pair<std::vector<bool>, std::vector<bool>> div_mod_result = n.div_and_mod(TEN);
-        mod.bits = div_mod_result.second;
-        n.bits = div_mod_result.first;
+        std::pair<uInt, uInt> div_mod_result = n.div_and_mod(TEN);
+        mod = div_mod_result.second;
+        n = div_mod_result.first;
         if (mod == ZERO)
             result = '0' + result;
         else if (mod == ONE)
@@ -755,7 +766,7 @@ std::string uInt::to_string() const {
 
 
 std::string uInt::to_string(const uint64_t& base) const {
-    std::string result_str;
+    std::string result_str("");
     if (base == 2u) {
         for (auto it = this->bits.rbegin(); it != this->bits.rend(); ++it) {
             result_str.append(1, *it ? '1' : '0');
@@ -765,7 +776,29 @@ std::string uInt::to_string(const uint64_t& base) const {
     if (base == 10u) {
         return this->to_string();
     }
-    throw std::runtime_error("ERROR: Unaccepted base");
+    if (base == 64u) {
+        if (*this == ZERO) return std::string("0");
+        uInt uint_base(base), copy(*this), mod;
+        while (copy != ZERO) {
+            std::pair<uInt, uInt> div_mod_result = copy.div_and_mod(uint_base);
+            mod = div_mod_result.second;
+            copy = div_mod_result.first;
+            result_str = base64_index[uint64_t(mod)] + result_str;
+        }
+        return result_str;
+    }
+    if (base < 34u) {
+        if (*this == ZERO) return std::string("0");
+        uInt uint_base(base), copy(*this), mod;
+        while (copy != ZERO) {
+            std::pair<uInt, uInt> div_mod_result = copy.div_and_mod(uint_base);
+            mod = div_mod_result.second;
+            copy = div_mod_result.first;
+            result_str = base_n_index[uint64_t(mod)] + result_str;
+        }
+        return result_str;
+    }
+    throw std::runtime_error("ERROR: Unaccepted base: " + base);
 }
 
 
