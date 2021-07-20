@@ -66,7 +66,7 @@ Excluded operators: `&&`, `||`, `!`, `~`. All other operators are fully implemen
 
 Currently there is only one class method which is not an overloaded operator: `std::string uInt::to_string() const;` which converts the `uInt` to a `std::string`.
 
-## Examples:
+Example:
 ```
 #include "../src/uInt.hpp"
 #include <iostream>
@@ -209,4 +209,4 @@ PERFORMANCE TEST RESULTS
 
 ## Future Work
 
-I would like to spend a lot more time optimizing this project. The largest number calculated was the 100,000th term in the fibonacci sequence. This number was 20,899 decimal digits, however, it took about 3 minutes to perform this calculation with -O3.
+I would like to spend a lot more time optimizing this project. The largest number calculated was the 500,000th term in the fibonacci sequence. This number was 347,120 decimal digits, however, it took about 62 minutes to perform this calculation with -O3.
