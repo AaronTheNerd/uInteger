@@ -31,9 +31,9 @@
 
 
 #if PERFORMANCE_TEST
-    #include <iomanip>
-    #include <iostream>
-    #include <chrono>
+    #include <iomanip> // std::setw
+    #include <iostream> // std::cout
+    #include <chrono> // std::chrono
 #endif
 
 
@@ -89,8 +89,19 @@ class uInt {
 
 
   private:
-    // ========================== Helper Methods =========================== //
+    // ============================ Helper Methods ============================
+
+    // Performs a simultaneous division and modulo operation and returns a pair
+    // containing the results where the first item in the pair is an atn::uInt
+    // representing the result of the division and the second is an atn::uInt
+    // representing the result of the modulo.
     std::pair<uInt, uInt> div_and_mod(const uInt& n) const {
+        /*
+        Potential micro optimizations
+        1. Iterator vs. **uint64_t index**
+        2. Setting the quotient's value to `mod >= n` vs. **to true or false.**
+        3. Adding quotient[i] / *it's value to mod directly vs. **if statement**
+        */
         if (n == 0) {
             throw std::runtime_error("ERROR: Divide/Mod by 0 Exception");
         }
@@ -98,20 +109,22 @@ class uInt {
             return std::make_pair(*this, *this);
         }
         uInt quotient(*this), mod(0);
-        for (auto it = quotient.bits.rbegin(); it != quotient.bits.rend(); it++) {
+        uint64_t end = uint64_t(-1);
+        for (uint64_t i = quotient.bits.size() - 1; i != end; --i) {
             mod <<= 1;
-            if (*it) ++mod;
+            if (quotient.bits[i]) ++mod;
             if (mod >= n) {
-                *it = true;
+                quotient.bits[i] = true;
                 mod -= n;
             } else {
-                *it = false;
+                quotient.bits[i] = false;
             }
         }
         mod.remove_lead_zeros();
         quotient.remove_lead_zeros();
         return std::make_pair(quotient, mod);
     }
+
     void remove_lead_zeros() {
         #if PERFORMANCE_TEST
             START_TEST(REMOVE_LEAD_ZEROS_TIME)
@@ -130,9 +143,9 @@ class uInt {
         for (auto it = str.rbegin(); it != str.rend(); ++it) {
             if (*it != '1' && *it != '0') {
                 this->bits.clear();
-                return;
+                throw std::runtime_error("ERROR: Cannot input non-binary digits");
             }
-            this->bits.emplace_back((*it == '1') ? true : false);
+            this->bits.emplace_back(*it == '1');
         }
     }
 
@@ -787,7 +800,7 @@ std::string uInt::to_string(const uint64_t& base) const {
         }
         return result_str;
     }
-    if (base < 34u) {
+    if (base <= 36u) {
         if (*this == ZERO) return std::string("0");
         uInt uint_base(base), copy(*this), mod;
         while (copy != ZERO) {

@@ -1,28 +1,28 @@
-354224848179261915075
+43466557686937456435688527675040625802564660517371780402481729089536555417949051890403879840079255169295922593080322634775209689623239873322471161642996440906533187938298969649928516003704476137795166849228875
 
-N=100, Runtime: 0.572102ms
-Decimal digits: 21, Binary digits: 69
+N=1000, Average Runtime: 14.5516ms
+Decimal digits: 209, Binary digits: 694
 
 PERFORMANCE TEST RESULTS
 ======================================================
-          REMOVE_LEAD_ZEROS || 0.042055ms, 5.12038%
-                INT TO UINT || 0.059662ms, 7.26412%
+          REMOVE_LEAD_ZEROS ||  77.8776ms, 3.15588%
+                INT TO UINT ||  13.1643ms, 0.533463%
              STRING TO UINT ||        0ms, 0%
-                       COPY || 0.037249ms, 4.53523%
-                   ADDITION ||  0.05731ms, 6.97775%
-                SUBTRACTION ||  0.06735ms, 8.20016%
-             MULTIPLICATION || 0.115286ms, 14.0366%
+                       COPY ||  70.0663ms, 2.83933%
+                   ADDITION ||  180.209ms, 7.30271%
+                SUBTRACTION ||  304.056ms, 12.3214%
+             MULTIPLICATION ||  232.775ms, 9.43289%
                    DIVISION ||        0ms, 0%
-                     MODULO || 0.015827ms, 1.92701%
-                 SHIFT LEFT || 0.094861ms, 11.5498%
+                     MODULO ||  1.52658ms, 0.0618623%
+                 SHIFT LEFT ||  355.322ms, 14.3989%
                 SHIFT RIGHT ||        0ms, 0%
                 BITWISE AND ||        0ms, 0%
                  BITWISE OR ||        0ms, 0%
                 BITWISE XOR ||        0ms, 0%
-                     EQUALS || 0.002121ms, 0.258241%
-                 NOT EQUALS ||  9.8e-05ms, 0.0119319%
+                     EQUALS || 0.623981ms, 0.0252859%
+                 NOT EQUALS || 0.005455ms, 0.000221056%
                   LESS THAN ||        0ms, 0%
                GREATER THAN ||        0ms, 0%
-   GREATER THAN OR EQUAL TO ||  0.00233ms, 0.283688%
-      LESS THAN OR EQUAL TO || 0.002383ms, 0.290141%
-             UINT TO STRING || 0.324793ms, 39.545%
+   GREATER THAN OR EQUAL TO ||  8.78249ms, 0.355898%
+      LESS THAN OR EQUAL TO ||  8.40473ms, 0.340589%
+             UINT TO STRING ||  1214.89ms, 49.2315%
