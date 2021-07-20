@@ -1,23 +1,16 @@
 # Written by Aaron Barge
 CC = g++
-CFLAGS = -O3 -o run
+CFLAGS = -g -o run
 N = 100
 SEED = 0
 
+baseline: src/uInt.hpp tests/unit_tests.cpp
+	$(CC) $(CFLAGS) -D BASE_LINE tests/unit_tests.cpp
+	./run $(N) > data/baseline.txt
 
-benchmark: tests/benchmark.cpp src/uInt.hpp
-	$(CC) $(CFLAGS) tests/benchmark.cpp
-	./run $(N) > data/benchmark.txt
-
-random_unit_tests: tests/unit_tests.cpp src/uInt.hpp
+beta: src/uInt-beta.hpp tests/unit_tests.cpp
 	$(CC) $(CFLAGS) tests/unit_tests.cpp
-	./run $(N) > data/unit_tests.txt
-
-set_unit_tests: tests/unit_tests.cpp src/uInt.hpp
-	$(CC) $(CFLAGS) tests/unit_tests.cpp
-	./run $(N) $(SEED) > data/unit_tests.txt
-
-tests : benchmark random_unit_tests
+	./run $(N) > data/beta.txt
 
 clean:
 	rm *.out run
