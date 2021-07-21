@@ -16,14 +16,12 @@
 #ifndef _UINTEGER_UINT_HPP_
 #define _UINTEGER_UINT_HPP_
 
-#define PERFORMANCE_TEST 1
-
 #include <climits> // CHAR_BIT
 #include <numeric> // std::accumulate
 #include <stdexcept> // runtime_error
 #include <string> // std::string
 #include <vector> // std::vector
-#if PERFORMANCE_TEST
+#ifdef PERFORMANCE_TEST
     #include <iomanip> // std::setw
     #include <iostream> // std::cout
     #include <chrono> // std::chrono
@@ -33,7 +31,7 @@ namespace atn { // AaronTheNerd
 
 // ====================== Performance Testing Variables =======================
 
-#if PERFORMANCE_TEST
+#ifdef PERFORMANCE_TEST
     #define TEST_RESOLUTION std::chrono::duration<double, std::milli>
     #define CLOCK std::chrono::high_resolution_clock
     enum {
@@ -191,12 +189,12 @@ std::pair<uInt, uInt> uInt::div_and_mod(const uInt& n) const {
 }
 
 void uInt::remove_lead_zeros() {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(REMOVE_LEAD_ZEROS_TIME)
     #endif
     while (this->bits.size() != 0 && !this->bits.back())
         this->bits.pop_back();
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(REMOVE_LEAD_ZEROS_TIME)
     #endif
 }
@@ -313,7 +311,7 @@ uInt::uInt() : bits(std::vector<bool>()) {}
 
 uInt::uInt(const uint64_t& num)
         : bits(std::vector<bool>()) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(INT_TO_UINT_TIME)
     #endif
     uint64_t copy = num;
@@ -322,14 +320,14 @@ uInt::uInt(const uint64_t& num)
         copy >>= 1;
     }
     this->remove_lead_zeros();
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(INT_TO_UINT_TIME)
     #endif
 }
 
 uInt::uInt(const std::string& str)
         : bits(std::vector<bool>()) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(STRING_TO_UINT_TIME)
     #endif
     if (str.size() == 0) {
@@ -350,14 +348,14 @@ uInt::uInt(const std::string& str)
         this->convert_decimal_string(str);
     }
     this->remove_lead_zeros();
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(STRING_TO_UINT_TIME)
     #endif
 }
 
 uInt::uInt(const uInt& n)
         : bits(std::vector<bool>()) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(COPY_TIME)
     #endif
     if (this != &n) {
@@ -365,7 +363,7 @@ uInt::uInt(const uInt& n)
         for (uint64_t i = 0; i < this->bits.size(); ++i)
             this->bits[i] = n.bits[i];
     }
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(COPY_TIME)
     #endif
 }
@@ -373,7 +371,7 @@ uInt::uInt(const uInt& n)
 // ================================ To String =================================
 
 std::string uInt::to_string() const {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(UINT_TO_STRING_TIME)
     #endif
     if (*this == ZERO) return std::string("0");
@@ -407,7 +405,7 @@ std::string uInt::to_string() const {
             return "";
         }
     }
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(UINT_TO_STRING_TIME)
     #endif
     return result;
@@ -453,7 +451,7 @@ std::string uInt::to_string(const uint64_t& base) const {
 
 // ============================== Add and Assign ==============================
 uInt& uInt::operator+=(const uInt& n) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
             START_TEST(ADD_TIME)
         #endif
         bool n1 = 0, n2 = 0, carry = 0;
@@ -468,7 +466,7 @@ uInt& uInt::operator+=(const uInt& n) {
         }
         if (carry)
             this->bits.emplace_back(true);
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(ADD_TIME)
         #endif
         return *this; 
@@ -476,12 +474,12 @@ uInt& uInt::operator+=(const uInt& n) {
 
 // ============================= Minus and Assign =============================
 uInt& uInt::operator-=(const uInt& n) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(SUB_TIME)
     #endif
     if (*this <= n) {
         this->bits.clear();
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             START_TEST(SUB_TIME)
         #endif
         return *this;
@@ -503,7 +501,7 @@ uInt& uInt::operator-=(const uInt& n) {
             }
             if (j == this->bits.size()) {
                 this->bits.clear();
-                #if PERFORMANCE_TEST
+                #ifdef PERFORMANCE_TEST
                     END_TEST(SUB_TIME)
                 #endif
                 return *this;
@@ -511,7 +509,7 @@ uInt& uInt::operator-=(const uInt& n) {
         }
     }
     this->remove_lead_zeros();
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(SUB_TIME)
     #endif
     return *this;
@@ -519,7 +517,7 @@ uInt& uInt::operator-=(const uInt& n) {
 
 // =========================== Multiply and Assign ============================
 uInt& uInt::operator*=(const uInt& n) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(MUL_TIME)
     #endif
     uInt mult, shifted_n(n);
@@ -528,7 +526,7 @@ uInt& uInt::operator*=(const uInt& n) {
         shifted_n <<= 1;
     }
     this->bits = mult.bits;
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(MUL_TIME)
     #endif
     return *this;
@@ -536,14 +534,14 @@ uInt& uInt::operator*=(const uInt& n) {
 
 // ============================ Divide and Assign =============================
 uInt& uInt::operator/=(const uInt& n) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(DIV_TIME)
     #endif
     if (n == 0) {
         throw std::runtime_error("ERROR: Divide by 0 Exception");
     }
     if (this->bits.size() == 0) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             START_TEST(DIV_TIME)
         #endif
         return *this;
@@ -560,7 +558,7 @@ uInt& uInt::operator/=(const uInt& n) {
         }
     }
     this->remove_lead_zeros();
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(DIV_TIME)
     #endif
     return *this;
@@ -568,7 +566,7 @@ uInt& uInt::operator/=(const uInt& n) {
 
 // ============================== Mod and Assign ==============================
 uInt& uInt::operator%=(const uInt& n) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(MOD_TIME)
     #endif
     uInt curr(0);
@@ -584,7 +582,7 @@ uInt& uInt::operator%=(const uInt& n) {
     }
     this->bits = curr.bits;
     this->remove_lead_zeros();
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(MOD_TIME)
     #endif
     return *this;
@@ -592,12 +590,12 @@ uInt& uInt::operator%=(const uInt& n) {
 
 // ========================== Shift Left and Assign ===========================
 uInt& uInt::operator<<=(const uint64_t& pos) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(SL_TIME)
     #endif
     if (this->bits.size() == 0 || pos == 0) return *this;
     this->bits.insert(this->bits.begin(), pos, false);
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(SL_TIME)
     #endif
     return *this;
@@ -605,12 +603,12 @@ uInt& uInt::operator<<=(const uint64_t& pos) {
 
 // ========================== Shift Right and Assign ==========================
 uInt& uInt::operator>>=(const uint64_t& pos) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(SR_TIME)
     #endif
     if (this->bits.size() == 0 || pos == 0) return *this;
     this->bits.erase(this->bits.begin(), this->bits.begin() + pos);
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(SR_TIME)
     #endif
     return *this;
@@ -618,7 +616,7 @@ uInt& uInt::operator>>=(const uint64_t& pos) {
 
 // ========================== Bitwise AND and Assign ==========================
 uInt& uInt::operator&=(const uInt& n) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(AND_TIME)
     #endif
     if (this->bits.size() > n.bits.size())
@@ -627,7 +625,7 @@ uInt& uInt::operator&=(const uInt& n) {
         this->bits[i] = this->bits[i] && n.bits[i];
     }
     this->remove_lead_zeros();
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(AND_TIME)
     #endif
     return *this;
@@ -635,7 +633,7 @@ uInt& uInt::operator&=(const uInt& n) {
 
 // ========================== Bitwise OR and Assign ===========================
 uInt& uInt::operator|=(const uInt& n) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(OR_TIME)
     #endif
     if (this->bits.size() < n.bits.size())
@@ -644,7 +642,7 @@ uInt& uInt::operator|=(const uInt& n) {
         this->bits[i] = this->bits[i] || n.bits[i];
     }
     this->remove_lead_zeros();
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(OR_TIME)
     #endif
     return *this;
@@ -652,7 +650,7 @@ uInt& uInt::operator|=(const uInt& n) {
 
 // ========================== Bitwise XOR and Assign ==========================
 uInt& uInt::operator^=(const uInt& n) {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
             START_TEST(XOR_TIME)
         #endif
         if (this->bits.size() < n.bits.size())
@@ -661,7 +659,7 @@ uInt& uInt::operator^=(const uInt& n) {
             this->bits[i] = this->bits[i] ^ n.bits[i];
         }
         this->remove_lead_zeros();
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(XOR_TIME)
         #endif
         return *this;
@@ -742,168 +740,168 @@ uInt& uInt::operator--() {
 // ============================= Conditional ==============================
 
 bool uInt::operator==(const uInt& n) const {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(EQ_TIME)
     #endif
     if (this->bits.size() != n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(EQ_TIME)
         #endif
         return false;
     }
     for (uint64_t i = 0; i < this->bits.size(); ++i) {
         if (this->bits[i] ^ n.bits[i]) {
-            #if PERFORMANCE_TEST
+            #ifdef PERFORMANCE_TEST
                 END_TEST(EQ_TIME)
             #endif
             return false;
         }
     }
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(EQ_TIME)
     #endif
     return true;
 }
 
 bool uInt::operator!=(const uInt& n) const {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(NEQ_TIME)
     #endif
     if (this->bits.size() != n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(NEQ_TIME)
         #endif
         return true;
     }
     for (uint64_t i = 0; i < this->bits.size(); ++i) {
         if (this->bits[i] ^ n.bits[i]) {
-            #if PERFORMANCE_TEST
+            #ifdef PERFORMANCE_TEST
                 END_TEST(NEQ_TIME)
             #endif
             return true;
         }
     }
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(NEQ_TIME)
     #endif
     return false;
 }
 
 bool uInt::operator<(const uInt& n) const {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(LT_TIME)
     #endif
     if (this->bits.size() < n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(LT_TIME)
         #endif
         return true;
     }
     else if (this->bits.size() > n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(LT_TIME)
         #endif
         return false;
     }
     for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
         if (this->bits[i] ^ n.bits[i]) {
-            #if PERFORMANCE_TEST
+            #ifdef PERFORMANCE_TEST
                 END_TEST(LT_TIME)
             #endif
             return n.bits[i];
         }
     }
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(LT_TIME)
     #endif
     return false;
 }
 
 bool uInt::operator>(const uInt& n) const {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(GT_TIME)
     #endif
     if (this->bits.size() > n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(GT_TIME)
         #endif
         return true;
     }
     else if (this->bits.size() < n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(GT_TIME)
         #endif
         return false;
     }
     for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
         if (this->bits[i] ^ n.bits[i]) {
-            #if PERFORMANCE_TEST
+            #ifdef PERFORMANCE_TEST
                 END_TEST(GT_TIME)
             #endif
             return this->bits[i];
         }
     }
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(GT_TIME)
     #endif
     return false;
 }
 
 bool uInt::operator<=(const uInt& n) const {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(LTE_TIME)
     #endif
     if (this->bits.size() < n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(LTE_TIME)
         #endif
         return true;
     }
     else if (this->bits.size() > n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(LTE_TIME)
         #endif
         return false;
     }
     for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
         if (this->bits[i] ^ n.bits[i]) {
-            #if PERFORMANCE_TEST
+            #ifdef PERFORMANCE_TEST
                 END_TEST(LTE_TIME)
             #endif
             return n.bits[i];
         }
     }
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(LTE_TIME)
     #endif
     return true;
 }
 
 bool uInt::operator>=(const uInt& n) const {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(GTE_TIME)
     #endif
     if (this->bits.size() > n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(GTE_TIME)
         #endif
         return true;
     }
     else if (this->bits.size() < n.bits.size()) {
-        #if PERFORMANCE_TEST
+        #ifdef PERFORMANCE_TEST
             END_TEST(GTE_TIME)
         #endif
         return false;
     }
     for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
         if (this->bits[i] ^ n.bits[i]) {
-            #if PERFORMANCE_TEST
+            #ifdef PERFORMANCE_TEST
                 END_TEST(GTE_TIME)
             #endif
             return this->bits[i];
         }
     }
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(GTE_TIME)
     #endif
     return true;
@@ -912,11 +910,11 @@ bool uInt::operator>=(const uInt& n) const {
 // =============================== Casting ================================
 
 uInt::operator uint64_t() const {
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         START_TEST(UINT_TO_INT_TIME)
     #endif
     uint64_t result = std::accumulate(this->bits.rbegin(), this->bits.rend(), 0ull, [](unsigned long long x, bool y) { return (x << 1) + y; });
-    #if PERFORMANCE_TEST
+    #ifdef PERFORMANCE_TEST
         END_TEST(UINT_TO_INT_TIME)
     #endif
     return result;
@@ -962,7 +960,7 @@ uInt& operator^(const uint64_t& num, const uInt& n) {
 }
 // =========================== Performance Testing ============================
 
-#if PERFORMANCE_TEST
+#ifdef PERFORMANCE_TEST
 void print_performance_test_results() {
     double total = 0.0;
     for (auto time : durations) {
