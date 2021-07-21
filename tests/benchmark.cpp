@@ -1,4 +1,8 @@
+#ifdef BETA
+#include "../src/uInt-beta.hpp"
+#else
 #include "../src/uInt.hpp"
+#endif
 #include <chrono>
 #include <iostream>
 
@@ -26,25 +30,29 @@ atn::uInt fibo_fast(uint64_t n) {
     fibo_fast(n, res);
     return res[0];
 }
-#define NT 100
+
 int main(int argc, char** argv) {
-    uint64_t N = 100;
+    uint64_t N;
     if (argc > 1) {
         N = std::stoi(argv[1]);
+    }
+    uint64_t F;
+    if (argc > 2) {
+        F = std::stoi(argv[2]);
     }
     auto start = std::chrono::high_resolution_clock::now();
     atn::uInt n;
     std::string str;
-    for (size_t i = 0; i < NT; ++i) {
-        n = fibo_fast(N);
+    for (size_t i = 0; i < N; ++i) {
+        n = fibo_fast(F);
         str = n.to_string();
     }
     auto stop = std::chrono::high_resolution_clock::now();
     std::cout << str << std::endl;
     std::chrono::duration<double, std::milli> total = stop - start;
-    std::cout << std::endl << "N=" << N << ", Average Runtime: " << total.count() / NT << "ms" << std::endl;
+    std::cout << std::endl << "F(" << F << "), N=" << N << ", Average Runtime: " << total.count() / N << "ms" << std::endl;
     std::cout << "Decimal digits: " << str.size() << ", Binary digits: " << n.bits.size() << std::endl;
     #if PERFORMANCE_TEST
-    atn::print_performance_test_results();
+        atn::print_performance_test_results();
     #endif
 }

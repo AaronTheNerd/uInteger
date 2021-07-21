@@ -311,7 +311,7 @@ bool test_all(uint64_t n1, uint64_t n2) {
 }
 
 int main(int argc, char** argv) {
-    uint64_t N = 100;
+    uint64_t N;
     if (argc > 1) {
         N = std::stoi(argv[1]);
     }
