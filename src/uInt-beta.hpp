@@ -57,6 +57,7 @@ namespace atn { // AaronTheNerd
         GT_TIME,
         LTE_TIME,
         GTE_TIME,
+        UINT_TO_INT_TIME,
         UINT_TO_STRING_TIME,
         NUM_OF_TESTS
     };
@@ -480,6 +481,9 @@ uInt& uInt::operator-=(const uInt& n) {
     #endif
     if (*this <= n) {
         this->bits.clear();
+        #if PERFORMANCE_TEST
+            START_TEST(SUB_TIME)
+        #endif
         return *this;
     }
     bool n1 = 0, n2 = 0;
@@ -499,6 +503,9 @@ uInt& uInt::operator-=(const uInt& n) {
             }
             if (j == this->bits.size()) {
                 this->bits.clear();
+                #if PERFORMANCE_TEST
+                    END_TEST(SUB_TIME)
+                #endif
                 return *this;
             }
         }
@@ -536,6 +543,9 @@ uInt& uInt::operator/=(const uInt& n) {
         throw std::runtime_error("ERROR: Divide by 0 Exception");
     }
     if (this->bits.size() == 0) {
+        #if PERFORMANCE_TEST
+            START_TEST(DIV_TIME)
+        #endif
         return *this;
     }
     uInt curr(0);
@@ -735,11 +745,19 @@ bool uInt::operator==(const uInt& n) const {
     #if PERFORMANCE_TEST
         START_TEST(EQ_TIME)
     #endif
-    if (this->bits.size() != n.bits.size())
+    if (this->bits.size() != n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(EQ_TIME)
+        #endif
         return false;
+    }
     for (uint64_t i = 0; i < this->bits.size(); ++i) {
-        if (this->bits[i] ^ n.bits[i])
+        if (this->bits[i] ^ n.bits[i]) {
+            #if PERFORMANCE_TEST
+                END_TEST(EQ_TIME)
+            #endif
             return false;
+        }
     }
     #if PERFORMANCE_TEST
         END_TEST(EQ_TIME)
@@ -751,11 +769,19 @@ bool uInt::operator!=(const uInt& n) const {
     #if PERFORMANCE_TEST
         START_TEST(NEQ_TIME)
     #endif
-    if (this->bits.size() != n.bits.size())
+    if (this->bits.size() != n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(NEQ_TIME)
+        #endif
         return true;
+    }
     for (uint64_t i = 0; i < this->bits.size(); ++i) {
-        if (this->bits[i] ^ n.bits[i])
+        if (this->bits[i] ^ n.bits[i]) {
+            #if PERFORMANCE_TEST
+                END_TEST(NEQ_TIME)
+            #endif
             return true;
+        }
     }
     #if PERFORMANCE_TEST
         END_TEST(NEQ_TIME)
@@ -767,13 +793,25 @@ bool uInt::operator<(const uInt& n) const {
     #if PERFORMANCE_TEST
         START_TEST(LT_TIME)
     #endif
-    if (this->bits.size() < n.bits.size())
+    if (this->bits.size() < n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(LT_TIME)
+        #endif
         return true;
-    else if (this->bits.size() > n.bits.size())
+    }
+    else if (this->bits.size() > n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(LT_TIME)
+        #endif
         return false;
+    }
     for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
-        if (this->bits[i] ^ n.bits[i])
+        if (this->bits[i] ^ n.bits[i]) {
+            #if PERFORMANCE_TEST
+                END_TEST(LT_TIME)
+            #endif
             return n.bits[i];
+        }
     }
     #if PERFORMANCE_TEST
         END_TEST(LT_TIME)
@@ -785,13 +823,25 @@ bool uInt::operator>(const uInt& n) const {
     #if PERFORMANCE_TEST
         START_TEST(GT_TIME)
     #endif
-    if (this->bits.size() > n.bits.size())
+    if (this->bits.size() > n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(GT_TIME)
+        #endif
         return true;
-    else if (this->bits.size() < n.bits.size())
+    }
+    else if (this->bits.size() < n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(GT_TIME)
+        #endif
         return false;
+    }
     for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
-        if (this->bits[i] ^ n.bits[i])
+        if (this->bits[i] ^ n.bits[i]) {
+            #if PERFORMANCE_TEST
+                END_TEST(GT_TIME)
+            #endif
             return this->bits[i];
+        }
     }
     #if PERFORMANCE_TEST
         END_TEST(GT_TIME)
@@ -803,13 +853,25 @@ bool uInt::operator<=(const uInt& n) const {
     #if PERFORMANCE_TEST
         START_TEST(LTE_TIME)
     #endif
-    if (this->bits.size() < n.bits.size())
+    if (this->bits.size() < n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(LTE_TIME)
+        #endif
         return true;
-    else if (this->bits.size() > n.bits.size())
+    }
+    else if (this->bits.size() > n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(LTE_TIME)
+        #endif
         return false;
+    }
     for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
-        if (this->bits[i] ^ n.bits[i])
+        if (this->bits[i] ^ n.bits[i]) {
+            #if PERFORMANCE_TEST
+                END_TEST(LTE_TIME)
+            #endif
             return n.bits[i];
+        }
     }
     #if PERFORMANCE_TEST
         END_TEST(LTE_TIME)
@@ -821,13 +883,25 @@ bool uInt::operator>=(const uInt& n) const {
     #if PERFORMANCE_TEST
         START_TEST(GTE_TIME)
     #endif
-    if (this->bits.size() > n.bits.size())
+    if (this->bits.size() > n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(GTE_TIME)
+        #endif
         return true;
-    else if (this->bits.size() < n.bits.size())
+    }
+    else if (this->bits.size() < n.bits.size()) {
+        #if PERFORMANCE_TEST
+            END_TEST(GTE_TIME)
+        #endif
         return false;
+    }
     for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
-        if (this->bits[i] ^ n.bits[i])
+        if (this->bits[i] ^ n.bits[i]) {
+            #if PERFORMANCE_TEST
+                END_TEST(GTE_TIME)
+            #endif
             return this->bits[i];
+        }
     }
     #if PERFORMANCE_TEST
         END_TEST(GTE_TIME)
@@ -838,7 +912,14 @@ bool uInt::operator>=(const uInt& n) const {
 // =============================== Casting ================================
 
 uInt::operator uint64_t() const {
-    return std::accumulate(this->bits.rbegin(), this->bits.rend(), 0ull, [](unsigned long long x, bool y) { return (x << 1) + y; });
+    #if PERFORMANCE_TEST
+        START_TEST(UINT_TO_INT_TIME)
+    #endif
+    uint64_t result = std::accumulate(this->bits.rbegin(), this->bits.rend(), 0ull, [](unsigned long long x, bool y) { return (x << 1) + y; });
+    #if PERFORMANCE_TEST
+        END_TEST(UINT_TO_INT_TIME)
+    #endif
+    return result;
 }
 
 // =========================== Non-Class Functions ============================
@@ -952,6 +1033,9 @@ void print_performance_test_results() {
                 break;
             case GTE_TIME:
                 std::cout << "LESS THAN OR EQUAL TO";
+                break;
+            case UINT_TO_INT_TIME:
+                std::cout << "UINT TO INT";
                 break;
             case UINT_TO_STRING_TIME:
                 std::cout << "UINT TO STRING";
