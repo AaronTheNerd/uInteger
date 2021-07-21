@@ -133,6 +133,8 @@ class uInt {
 
 // ============================= Helper Variables =============================
 
+static constexpr uint64_t const& negative_one = uint64_t(-1);
+
 const std::string base64_index("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
 const std::string base_n_index("0123456789abcdefghijklmnopqrstuvwxyz");
 
@@ -172,8 +174,7 @@ std::pair<uInt, uInt> uInt::div_and_mod(const uInt& n) const {
         return std::make_pair(*this, *this);
     }
     uInt quotient(*this), mod;
-    uint64_t end = uint64_t(-1);
-    for (uint64_t i = quotient.bits.size() - 1; i != end; --i) {
+    for (uint64_t i = quotient.bits.size() - 1; i != negative_one; --i) {
         mod <<= 1;
         if (quotient.bits[i]) ++mod;
         if (mod >= n) {
@@ -374,16 +375,16 @@ std::string uInt::to_string() const {
     #ifdef PERFORMANCE_TEST
         START_TEST(UINT_TO_STRING_TIME)
     #endif
-    if (*this == ZERO) return std::string("0");
+    if (this->bits.empty()) return std::string("0");
     uInt n(*this), mod;
     std::string result("");
-    while (n != ZERO) {
+    while (n.bits.size()) {
         std::pair<uInt, uInt> div_mod_result = n.div_and_mod(TEN);
         mod = div_mod_result.second;
         n = div_mod_result.first;
-        if (mod == ZERO)
+        if (mod.bits.empty())
             result = '0' + result;
-        else if (mod == ONE)
+        else if (mod.bits.size() == 1)
             result = '1' + result;
         else if (mod == TWO)
             result = '2' + result;
@@ -458,11 +459,17 @@ uInt& uInt::operator+=(const uInt& n) {
         if (this->bits.size() < n.bits.size()) {
             this->bits.resize(n.bits.size(), false);
         }
-        for (uint64_t i = 0; i < this->bits.size(); ++i) {
+        uint64_t i;
+        for (i = 0; i < n.bits.size(); ++i) {
             n1 = this->bits[i];
-            n2 = (i >= n.bits.size()) ? false : n.bits[i];
-            this->bits[i] = carry ^ (n1 ^ n2);
+            n2 = n.bits[i];
+            this->bits[i] = carry != (n1 != n.bits[i]);
             carry = (n1 && n2) || (n1 && carry) || (n2 && carry);
+        }
+        for (; i < this->bits.size(); ++i) {
+            n1 = this->bits[i];
+            this->bits[i] = carry != n1;
+            carry = n1 && carry;
         }
         if (carry)
             this->bits.emplace_back(true);
@@ -485,21 +492,19 @@ uInt& uInt::operator-=(const uInt& n) {
         return *this;
     }
     bool n1 = 0, n2 = 0;
-    for (uint64_t i = 0; i < this->bits.size(); ++i) {
+    uint64_t this_end = this->bits.size(), n_end = n.bits.size(), j;
+    for (uint64_t i = 0; i < n_end; ++i) {
         n1 = this->bits[i];
-        n2 = (i >= n.bits.size()) ? false : n.bits[i];
-        this->bits[i] = n1 ^ n2;
+        n2 = n.bits[i];
+        this->bits[i] = n1 != n2;
         if (n2 && !n1) {
-            uint64_t j;
-            for (j = i + 1; j < this->bits.size(); ++j) {
-                if (this->bits[j]) {
-                    this->bits[j] = false;
+            for (j = i + 1; j < this_end; ++j) {
+                this->bits[j] = !this->bits[j];
+                if (!this->bits[j]) {
                     break;
-                } else {
-                    this->bits[j] = true;
                 }
             }
-            if (j == this->bits.size()) {
+            if (j == this_end) {
                 this->bits.clear();
                 #ifdef PERFORMANCE_TEST
                     END_TEST(SUB_TIME)
@@ -521,7 +526,8 @@ uInt& uInt::operator*=(const uInt& n) {
         START_TEST(MUL_TIME)
     #endif
     uInt mult, shifted_n(n);
-    for (uint64_t i = 0; i < this->bits.size(); ++i) {
+    uint64_t end = this->bits.size();
+    for (uint64_t i = 0; i < end; ++i) {
         if (this->bits[i]) mult += shifted_n;
         shifted_n <<= 1;
     }
@@ -547,14 +553,14 @@ uInt& uInt::operator/=(const uInt& n) {
         return *this;
     }
     uInt curr(0);
-    for (auto it = this->bits.rbegin(); it != this->bits.rend(); it++) {
+    for (uint64_t i = this->bits.size() - 1; i != negative_one; --i) {
         curr <<= 1;
-        if (*it) ++curr;
+        if (this->bits[i]) ++curr;
         if (curr >= n) {
-            *it = true;
+            this->bits[i] = true;
             curr -= n;
         } else {
-            *it = false;
+            this->bits[i] = false;
         }
     }
     this->remove_lead_zeros();
@@ -570,14 +576,11 @@ uInt& uInt::operator%=(const uInt& n) {
         START_TEST(MOD_TIME)
     #endif
     uInt curr(0);
-    for (auto it = this->bits.rbegin(); it != this->bits.rend(); it++) {
+    for (uint64_t i = this->bits.size() - 1; i != negative_one; --i) {
         curr <<= 1;
-        if (*it) ++curr;
+        if (this->bits[i]) ++curr;
         if (curr >= n) {
-            *it = true;
             curr -= n;
-        } else {
-            *it = false;
         }
     }
     this->bits = curr.bits;
@@ -621,7 +624,8 @@ uInt& uInt::operator&=(const uInt& n) {
     #endif
     if (this->bits.size() > n.bits.size())
         this->bits.resize(n.bits.size(), false);
-    for (uint64_t i = 0; i < this->bits.size(); ++i) {
+    uint64_t end = this->bits.size();
+    for (uint64_t i = 0; i < end; ++i) {
         this->bits[i] = this->bits[i] && n.bits[i];
     }
     this->remove_lead_zeros();
@@ -638,7 +642,8 @@ uInt& uInt::operator|=(const uInt& n) {
     #endif
     if (this->bits.size() < n.bits.size())
         this->bits.resize(n.bits.size(), false);
-    for (uint64_t i = 0; i < n.bits.size(); ++i) {
+    uint64_t end = n.bits.size();
+    for (uint64_t i = 0; i < end; ++i) {
         this->bits[i] = this->bits[i] || n.bits[i];
     }
     this->remove_lead_zeros();
@@ -655,7 +660,8 @@ uInt& uInt::operator^=(const uInt& n) {
         #endif
         if (this->bits.size() < n.bits.size())
             this->bits.resize(n.bits.size(), false);
-        for (uint64_t i = 0; i < n.bits.size(); ++i) {
+        uint64_t end = n.bits.size();
+        for (uint64_t i = 0; i < end; ++i) {
             this->bits[i] = this->bits[i] ^ n.bits[i];
         }
         this->remove_lead_zeros();
@@ -749,8 +755,9 @@ bool uInt::operator==(const uInt& n) const {
         #endif
         return false;
     }
-    for (uint64_t i = 0; i < this->bits.size(); ++i) {
-        if (this->bits[i] ^ n.bits[i]) {
+    uint64_t end = this->bits.size();
+    for (uint64_t i = 0; i < end; ++i) {
+        if (this->bits[i] != n.bits[i]) {
             #ifdef PERFORMANCE_TEST
                 END_TEST(EQ_TIME)
             #endif
@@ -773,8 +780,9 @@ bool uInt::operator!=(const uInt& n) const {
         #endif
         return true;
     }
-    for (uint64_t i = 0; i < this->bits.size(); ++i) {
-        if (this->bits[i] ^ n.bits[i]) {
+    uint64_t end = this->bits.size();
+    for (uint64_t i = 0; i < end; ++i) {
+        if (this->bits[i] != n.bits[i]) {
             #ifdef PERFORMANCE_TEST
                 END_TEST(NEQ_TIME)
             #endif
@@ -797,14 +805,14 @@ bool uInt::operator<(const uInt& n) const {
         #endif
         return true;
     }
-    else if (this->bits.size() > n.bits.size()) {
+    if (this->bits.size() > n.bits.size()) {
         #ifdef PERFORMANCE_TEST
             END_TEST(LT_TIME)
         #endif
         return false;
     }
-    for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
-        if (this->bits[i] ^ n.bits[i]) {
+    for (uint64_t i = this->bits.size() - 1; i != negative_one; --i) {
+        if (this->bits[i] != n.bits[i]) {
             #ifdef PERFORMANCE_TEST
                 END_TEST(LT_TIME)
             #endif
@@ -827,14 +835,14 @@ bool uInt::operator>(const uInt& n) const {
         #endif
         return true;
     }
-    else if (this->bits.size() < n.bits.size()) {
+    if (this->bits.size() < n.bits.size()) {
         #ifdef PERFORMANCE_TEST
             END_TEST(GT_TIME)
         #endif
         return false;
     }
-    for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
-        if (this->bits[i] ^ n.bits[i]) {
+    for (uint64_t i = this->bits.size() - 1; i != negative_one; --i) {
+        if (this->bits[i] != n.bits[i]) {
             #ifdef PERFORMANCE_TEST
                 END_TEST(GT_TIME)
             #endif
@@ -857,14 +865,14 @@ bool uInt::operator<=(const uInt& n) const {
         #endif
         return true;
     }
-    else if (this->bits.size() > n.bits.size()) {
+    if (this->bits.size() > n.bits.size()) {
         #ifdef PERFORMANCE_TEST
             END_TEST(LTE_TIME)
         #endif
         return false;
     }
-    for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
-        if (this->bits[i] ^ n.bits[i]) {
+    for (uint64_t i = this->bits.size() - 1; i != negative_one; --i) {
+        if (this->bits[i] != n.bits[i]) {
             #ifdef PERFORMANCE_TEST
                 END_TEST(LTE_TIME)
             #endif
@@ -887,14 +895,14 @@ bool uInt::operator>=(const uInt& n) const {
         #endif
         return true;
     }
-    else if (this->bits.size() < n.bits.size()) {
+    if (this->bits.size() < n.bits.size()) {
         #ifdef PERFORMANCE_TEST
             END_TEST(GTE_TIME)
         #endif
         return false;
     }
-    for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
-        if (this->bits[i] ^ n.bits[i]) {
+    for (uint64_t i = this->bits.size() - 1; i != negative_one; --i) {
+        if (this->bits[i] != n.bits[i]) {
             #ifdef PERFORMANCE_TEST
                 END_TEST(GTE_TIME)
             #endif
@@ -913,7 +921,7 @@ uInt::operator uint64_t() const {
     #ifdef PERFORMANCE_TEST
         START_TEST(UINT_TO_INT_TIME)
     #endif
-    uint64_t result = std::accumulate(this->bits.rbegin(), this->bits.rend(), 0ull, [](unsigned long long x, bool y) { return (x << 1) + y; });
+    uint64_t result = std::accumulate(this->bits.rbegin(), this->bits.rend(), 0ull, [](uint64_t x, bool y) { return (x << 1) + y; });
     #ifdef PERFORMANCE_TEST
         END_TEST(UINT_TO_INT_TIME)
     #endif
