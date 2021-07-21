@@ -1,6 +1,6 @@
 # Written by Aaron Barge
 CC = g++
-CFLAGS = -g -o run
+CFLAGS = -O3 -o run
 N = 100
 SEED = 0
 
