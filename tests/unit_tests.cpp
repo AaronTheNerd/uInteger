@@ -1,5 +1,6 @@
 #include "../src/uInt.hpp"
 #include <bitset>
+#include <chrono>
 #include <iomanip>
 #include <iostream>
 #include <numeric>
@@ -316,16 +317,23 @@ int main(int argc, char** argv) {
     }
     srand(SEED);
     std::cout << "SEED=" << SEED << ", N=" << N << std::endl << std::endl;
+    std::chrono::duration<double, std::milli> total;
+    auto start = std::chrono::high_resolution_clock::now();
     for (uint64_t i = 0; i < N; ++i) {
         uint64_t rand1 = rand();
         uint64_t rand2 = rand();
         std::cout << "=======================================" << std::endl;
         std::cout << "RUN #" << (i + 1) << ", n1=" << rand1 << ", n2=" << rand2 << std::endl;
+        auto start = std::chrono::high_resolution_clock::now();
         bool result = test_all(rand1, rand2);
+        auto stop = std::chrono::high_resolution_clock::now();
+        total += (stop - start);
         std::cout << "=======================================" << std::endl << std::endl;
         if (!result) {
             throw std::runtime_error("TEST #" + std::to_string(i + 1) + " HAS FAILED");
         }
     }
-    std::cout << "ALL TESTS SUCCEEDED" << std::endl;
+    std::cout << "ALL TESTS SUCCEEDED" << std::endl << std::endl;
+    std::cout << "Average time per test run: " << total.count() / N << "ms" << std::endl;
+    atn::print_performance_test_results();
 }
