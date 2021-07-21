@@ -335,5 +335,7 @@ int main(int argc, char** argv) {
     }
     std::cout << "ALL TESTS SUCCEEDED" << std::endl << std::endl;
     std::cout << "Average time per test run: " << total.count() / N << "ms" << std::endl;
-    atn::print_performance_test_results();
+    #ifdef PERFORMANCE_TEST
+        atn::print_performance_test_results();
+    #endif
 }

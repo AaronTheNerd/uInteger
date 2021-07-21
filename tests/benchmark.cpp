@@ -26,7 +26,7 @@ atn::uInt fibo_fast(uint64_t n) {
     fibo_fast(n, res);
     return res[0];
 }
-#define NT 100
+#define NT 1
 int main(int argc, char** argv) {
     uint64_t N = 100;
     if (argc > 1) {
@@ -45,6 +45,6 @@ int main(int argc, char** argv) {
     std::cout << std::endl << "N=" << N << ", Average Runtime: " << total.count() / NT << "ms" << std::endl;
     std::cout << "Decimal digits: " << str.size() << ", Binary digits: " << n.bits.size() << std::endl;
     #if PERFORMANCE_TEST
-    atn::print_performance_test_results();
+        atn::print_performance_test_results();
     #endif
 }
