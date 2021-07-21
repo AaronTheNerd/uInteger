@@ -1,29 +1,29 @@
 354224848179261915075
 
-F(100), N=100, Average Runtime: 0.313882ms
+F(100), N=100, Average Runtime: 0.274261ms
 Decimal digits: 21, Binary digits: 69
 
 PERFORMANCE TEST RESULTS
 ======================================================
-          REMOVE_LEAD_ZEROS ||  1.16207ms, 2.2723%
-                INT TO UINT || 0.158684ms, 0.31029%
+          REMOVE_LEAD_ZEROS ||  1.06416ms, 2.3723%
+                INT TO UINT || 0.152249ms, 0.339403%
              STRING TO UINT ||        0ms, 0%
-                       COPY ||  2.03847ms, 3.98601%
-                   ADDITION ||  3.68975ms, 7.21492%
-                SUBTRACTION ||  5.34098ms, 10.4437%
-             MULTIPLICATION ||  6.01291ms, 11.7576%
+                       COPY ||  1.75654ms, 3.91579%
+                   ADDITION ||   3.2548ms, 7.2558%
+                SUBTRACTION ||  4.68407ms, 10.442%
+             MULTIPLICATION ||  5.31047ms, 11.8384%
                    DIVISION ||        0ms, 0%
-                     MODULO ||  0.83493ms, 1.63262%
-                 SHIFT LEFT ||  5.70448ms, 11.1545%
+                     MODULO || 0.760113ms, 1.69449%
+                 SHIFT LEFT ||  5.03578ms, 11.2261%
                 SHIFT RIGHT ||        0ms, 0%
                 BITWISE AND ||        0ms, 0%
                  BITWISE OR ||        0ms, 0%
                 BITWISE XOR ||        0ms, 0%
-                     EQUALS || 0.425352ms, 0.831732%
-                 NOT EQUALS || 0.061095ms, 0.119465%
+                     EQUALS || 0.362635ms, 0.808408%
+                 NOT EQUALS ||  0.05107ms, 0.113848%
                   LESS THAN ||        0ms, 0%
                GREATER THAN ||        0ms, 0%
-   GREATER THAN OR EQUAL TO ||  1.04455ms, 2.04251%
-      LESS THAN OR EQUAL TO ||  2.16366ms, 4.23082%
+   GREATER THAN OR EQUAL TO ||   0.9104ms, 2.02952%
+      LESS THAN OR EQUAL TO ||   1.8885ms, 4.20996%
                 UINT TO INT ||        0ms, 0%
-             UINT TO STRING ||  22.5036ms, 44.0035%
+             UINT TO STRING ||  19.6271ms, 43.754%

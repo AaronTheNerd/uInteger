@@ -32,5 +32,7 @@ beta_benchmark: tests/benchmark.cpp src/uInt-beta.hpp
 	$(CC) $(CFLAGS) $(BETA) $(PERF_FLAG) tests/benchmark.cpp
 	./run $(N) $(F) > data/beta_benchmark.txt
 
+all: baseline beta baseline_benchmark beta_benchmark
+
 clean:
 	rm *.out run
