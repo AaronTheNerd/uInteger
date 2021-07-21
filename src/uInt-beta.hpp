@@ -1,7 +1,6 @@
 // Written by Aaron Barge
 // Copyright 2020
 
-
 // The Goal:
 // Implement an unsigned Integer class with arbitrary precision. Also this may
 // not be considered arbitrary technically. This is because it'll have an upper
@@ -135,20 +134,20 @@ class uInt {
 
 // ============================= Helper Variables =============================
 
-static const std::string base64_index("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
-static const std::string base_n_index("0123456789abcdefghijklmnopqrstuvwxyz");
+const std::string base64_index("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
+const std::string base_n_index("0123456789abcdefghijklmnopqrstuvwxyz");
 
-static const uInt ZERO = uInt(0);
-static const uInt ONE = uInt(1);
-static const uInt TWO = uInt(2);
-static const uInt THREE = uInt(3);
-static const uInt FOUR = uInt(4);
-static const uInt FIVE = uInt(5);
-static const uInt SIX = uInt(6);
-static const uInt SEVEN = uInt(7);
-static const uInt EIGHT = uInt(8);
-static const uInt NINE = uInt(9);
-static const uInt TEN = uInt(10);
+const uInt ZERO = uInt(0);
+const uInt ONE = uInt(1);
+const uInt TWO = uInt(2);
+const uInt THREE = uInt(3);
+const uInt FOUR = uInt(4);
+const uInt FIVE = uInt(5);
+const uInt SIX = uInt(6);
+const uInt SEVEN = uInt(7);
+const uInt EIGHT = uInt(8);
+const uInt NINE = uInt(9);
+const uInt TEN = uInt(10);
 
 // ============================================================================
 // =============================== Definitions ================================
@@ -167,13 +166,13 @@ std::pair<uInt, uInt> uInt::div_and_mod(const uInt& n) const {
     2. Setting the quotient's value to `mod >= n` vs. **to true or false.**
     3. Adding quotient[i] / *it's value to mod directly vs. **if statement**
     */
-    if (n == 0) {
+    if (n == ZERO) {
         throw std::runtime_error("ERROR: Divide/Mod by 0 Exception");
     }
     if (this->bits.size() == 0) {
         return std::make_pair(*this, *this);
     }
-    uInt quotient(*this), mod(0);
+    uInt quotient(*this), mod;
     uint64_t end = uint64_t(-1);
     for (uint64_t i = quotient.bits.size() - 1; i != end; --i) {
         mod <<= 1;
@@ -269,7 +268,7 @@ void uInt::convert_hex_string(std::string str) {
     }
 }
 
-inline bool uInt::odd(char c) const {
+bool uInt::odd(char c) const {
     return c == '1' || c == '3' || c == '5' || c == '7' || c == '9';
 }
 
@@ -355,14 +354,15 @@ uInt::uInt(const std::string& str)
     #endif
 }
 
-uInt::uInt(const uInt& n) {
+uInt::uInt(const uInt& n)
+        : bits(std::vector<bool>()) {
     #if PERFORMANCE_TEST
         START_TEST(COPY_TIME)
     #endif
     if (this != &n) {
         this->bits.resize(n.bits.size(), false);
         for (uint64_t i = 0; i < this->bits.size(); ++i)
-        this->bits[i] = n.bits[i];
+            this->bits[i] = n.bits[i];
     }
     #if PERFORMANCE_TEST
         END_TEST(COPY_TIME)
@@ -771,7 +771,7 @@ bool uInt::operator<(const uInt& n) const {
         return true;
     else if (this->bits.size() > n.bits.size())
         return false;
-    for (uint64_t i = this->bits.size(); i != uint64_t(-1); --i) {
+    for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
         if (this->bits[i] ^ n.bits[i])
             return n.bits[i];
     }
@@ -789,7 +789,7 @@ bool uInt::operator>(const uInt& n) const {
         return true;
     else if (this->bits.size() < n.bits.size())
         return false;
-    for (uint64_t i = this->bits.size(); i != uint64_t(-1); --i) {
+    for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
         if (this->bits[i] ^ n.bits[i])
             return this->bits[i];
     }
@@ -807,7 +807,7 @@ bool uInt::operator<=(const uInt& n) const {
         return true;
     else if (this->bits.size() > n.bits.size())
         return false;
-    for (uint64_t i = this->bits.size(); i != uint64_t(-1); --i) {
+    for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
         if (this->bits[i] ^ n.bits[i])
             return n.bits[i];
     }
@@ -825,7 +825,7 @@ bool uInt::operator>=(const uInt& n) const {
         return true;
     else if (this->bits.size() < n.bits.size())
         return false;
-    for (uint64_t i = this->bits.size(); i != uint64_t(-1); --i) {
+    for (uint64_t i = this->bits.size() - 1; i != uint64_t(-1); --i) {
         if (this->bits[i] ^ n.bits[i])
             return this->bits[i];
     }
