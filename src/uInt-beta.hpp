@@ -27,7 +27,7 @@
     #include <chrono> // std::chrono
 #endif
 
-namespace atn { // AaronTheNerd
+#define KARATSUBA_BOUNDARY 640
 
 // ====================== Performance Testing Variables =======================
 
@@ -71,6 +71,8 @@ namespace atn { // AaronTheNerd
         durations[x] += duration;
 #endif
 
+namespace atn { // AaronTheNerd
+
 // ============================================================================
 // ============================== Predefinitions ==============================
 // ============================================================================
@@ -85,6 +87,7 @@ class uInt {
     inline bool odd(char) const;
     std::string div_by_2(std::string) const;
     void convert_decimal_string(std::string);
+    uInt karatsuba(const uInt&) const;
   public:
     std::vector<bool> bits;
     // ============================= Constructors =============================
@@ -302,6 +305,28 @@ void uInt::convert_decimal_string(std::string str) {
         this->bits.emplace_back(odd(*(str.rbegin())));
         str = div_by_2(str);
     }
+}
+
+// https://en.wikipedia.org/wiki/Karatsuba_algorithm#Pseudocode
+uInt uInt::karatsuba(const uInt& n) const {
+    if (this->bits.size() < KARATSUBA_BOUNDARY
+            || n.bits.size() < KARATSUBA_BOUNDARY) {
+        return *this * n;
+    }
+    uInt h1, l1, h2, l2, z0, z1, z2, result;
+    uint64_t m = this->bits.size();
+    m = m < n.bits.size() ? m : n.bits.size();
+    uint64_t m2 = m >> 1;
+    h1.bits.insert(h1.bits.begin(), this->bits.begin() + m2, this->bits.end());
+    l1.bits.insert(l1.bits.begin(), this->bits.begin(), this->bits.begin() + m2);
+    h2.bits.insert(h2.bits.begin(), n.bits.begin() + m2, n.bits.end());
+    l2.bits.insert(l2.bits.begin(), n.bits.begin(), n.bits.begin() + m2);
+    z0 = l1.karatsuba(l2);
+    z1 = (l1 + h1).karatsuba(l2 + h2);
+    z2 = h1.karatsuba(h2);
+    result = (z2 << (m2 << 1)) + z0 + (z1 << m2);
+    result -= ((z2 + z0) << m2);
+    return result;
 }
 
 // ============================== Public Methods ==============================
@@ -525,6 +550,13 @@ uInt& uInt::operator*=(const uInt& n) {
     #ifdef PERFORMANCE_TEST
         START_TEST(MUL_TIME)
     #endif
+    if (this->bits.size() >= KARATSUBA_BOUNDARY && n.bits.size() >= KARATSUBA_BOUNDARY) {
+        *this = this->karatsuba(n);
+        #ifdef PERFORMANCE_TEST
+            END_TEST(MUL_TIME)
+        #endif
+        return *this;
+    }
     uInt mult, shifted_n(n);
     uint64_t end = this->bits.size();
     for (uint64_t i = 0; i < end; ++i) {
