@@ -431,7 +431,7 @@ std::string uInt::to_string() const {
         else if (mod == NINE)
             result = '9' + result;
         else {
-            throw std::runtime_error("To String operation failed");
+            throw std::runtime_error("ERROR: To String operation failed");
         }
     }
     #ifdef PERFORMANCE_TEST
