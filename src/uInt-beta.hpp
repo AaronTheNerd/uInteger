@@ -311,6 +311,9 @@ void uInt::convert_decimal_string(std::string str) {
 uInt uInt::karatsuba(const uInt& n) const {
     if (this->bits.size() < KARATSUBA_BOUNDARY
             || n.bits.size() < KARATSUBA_BOUNDARY) {
+        #ifdef PERFORMANCE_TEST
+            END_TEST(MUL_TIME)
+        #endif
         return *this * n;
     }
     uInt h1, l1, h2, l2, z0, z1, z2, result;
@@ -428,7 +431,7 @@ std::string uInt::to_string() const {
         else if (mod == NINE)
             result = '9' + result;
         else {
-            return "";
+            throw std::runtime_error("To String operation failed");
         }
     }
     #ifdef PERFORMANCE_TEST
@@ -438,6 +441,7 @@ std::string uInt::to_string() const {
 }
 
 std::string uInt::to_string(const uint64_t& base) const {
+    if (*this == ZERO) return std::string("0");
     std::string result_str("");
     if (base == 2u) {
         for (auto it = this->bits.rbegin(); it != this->bits.rend(); ++it) {
@@ -449,7 +453,6 @@ std::string uInt::to_string(const uint64_t& base) const {
         return this->to_string();
     }
     if (base == 64u) {
-        if (*this == ZERO) return std::string("0");
         uInt uint_base(base), copy(*this), mod;
         while (copy != ZERO) {
             std::pair<uInt, uInt> div_mod_result = copy.div_and_mod(uint_base);
@@ -460,7 +463,6 @@ std::string uInt::to_string(const uint64_t& base) const {
         return result_str;
     }
     if (base <= 36u) {
-        if (*this == ZERO) return std::string("0");
         uInt uint_base(base), copy(*this), mod;
         while (copy != ZERO) {
             std::pair<uInt, uInt> div_mod_result = copy.div_and_mod(uint_base);
