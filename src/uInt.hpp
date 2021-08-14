@@ -164,12 +164,6 @@ const uInt TEN = uInt(10);
 // representing the result of the division and the second is an atn::uInt
 // representing the result of the modulo.
 std::pair<uInt, uInt> uInt::div_and_mod(const uInt& n) const {
-    /*
-    Potential micro optimizations
-    1. Iterator vs. **uint64_t index**
-    2. Setting the quotient's value to `mod >= n` vs. **to true or false.**
-    3. Adding quotient[i] / *it's value to mod directly vs. **if statement**
-    */
     if (n == ZERO) {
         throw std::runtime_error("ERROR: Divide/Mod by 0 Exception");
     }
@@ -404,35 +398,14 @@ std::string uInt::to_string() const {
         START_TEST(UINT_TO_STRING_TIME)
     #endif
     if (this->bits.empty()) return std::string("0");
-    uInt n(*this), mod;
+    uInt n(*this);
+    char mod;
     std::string result("");
     while (n.bits.size()) {
         std::pair<uInt, uInt> div_mod_result = n.div_and_mod(TEN);
-        mod = div_mod_result.second;
+        mod = char(uint64_t(div_mod_result.second)) + '0';
         n = div_mod_result.first;
-        if (mod.bits.empty())
-            result = '0' + result;
-        else if (mod.bits.size() == 1)
-            result = '1' + result;
-        else if (mod == TWO)
-            result = '2' + result;
-        else if (mod == THREE)
-            result = '3' + result;
-        else if (mod == FOUR)
-            result = '4' + result;
-        else if (mod == FIVE)
-            result = '5' + result;
-        else if (mod == SIX)
-            result = '6' + result;
-        else if (mod == SEVEN)
-            result = '7' + result;
-        else if (mod == EIGHT)
-            result = '8' + result;
-        else if (mod == NINE)
-            result = '9' + result;
-        else {
-            throw std::runtime_error("ERROR: To String operation failed");
-        }
+        result = mod + result;
     }
     #ifdef PERFORMANCE_TEST
         END_TEST(UINT_TO_STRING_TIME)
@@ -1002,8 +975,8 @@ uInt& operator^(const uint64_t& num, const uInt& n) {
 }
 // =========================== Performance Testing ============================
 
-#ifdef PERFORMANCE_TEST
 void print_performance_test_results() {
+    #ifdef PERFORMANCE_TEST
     double total = 0.0;
     for (auto time : durations) {
         total += time.count();
@@ -1012,7 +985,7 @@ void print_performance_test_results() {
     std::cout << "======================================================" << std::endl;
     for (uint64_t i = 0; i < NUM_OF_TESTS; ++i) {
         double time = durations[i].count();
-        std::cout << std::setw(27);
+        std::cout << std::setw(24);
         switch (i) {
             case REMOVE_LEAD_ZEROS_TIME:
                 std::cout << "REMOVE_LEAD_ZEROS";
@@ -1085,8 +1058,8 @@ void print_performance_test_results() {
         }
         std::cout << " || " << std::setw(8) << time << "ms, " << (time / total * 100) << "%" << std::endl;
     }
+    #endif
 }
-#endif
 
 } // End namespace atn
 
