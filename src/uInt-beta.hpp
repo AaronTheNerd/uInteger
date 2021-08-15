@@ -16,15 +16,15 @@
 #ifndef _UINTEGER_UINT_HPP_
 #define _UINTEGER_UINT_HPP_
 
-#include <climits> // CHAR_BIT
 #include <numeric> // std::accumulate
-#include <stdexcept> // runtime_error
+#include <stdexcept> // std::runtime_error
 #include <string> // std::string
 #include <vector> // std::vector
+
 #ifdef PERFORMANCE_TEST
+    #include <chrono> // std::chrono
     #include <iomanip> // std::setw
     #include <iostream> // std::cout
-    #include <chrono> // std::chrono
 #endif
 
 #define KARATSUBA_BOUNDARY 640
@@ -134,7 +134,23 @@ class uInt {
     explicit operator uint64_t() const;
 };
 
+// =========================== Non-Class Functions ============================
+
+std::ostream& operator<<(std::ostream& out, const uInt& n);
+uInt& operator+(const uint64_t& num, const uInt& n);
+uInt& operator-(const uint64_t& num, const uInt& n);
+uInt& operator*(const uint64_t& num, const uInt& n);
+uInt& operator/(const uint64_t& num, const uInt& n);
+uInt& operator%(const uint64_t& num, const uInt& n);
+uInt& operator&(const uint64_t& num, const uInt& n);
+uInt& operator|(const uint64_t& num, const uInt& n);
+uInt& operator^(const uint64_t& num, const uInt& n);
+uInt& operator++(const uInt& n);
+uInt& operator--(const uInt& n);
+
+// ============================================================================
 // ============================= Helper Variables =============================
+// ============================================================================
 
 static constexpr uint64_t const& negative_one = uint64_t(-1);
 
@@ -973,6 +989,12 @@ uInt& operator|(const uint64_t& num, const uInt& n) {
 uInt& operator^(const uint64_t& num, const uInt& n) {
     return n ^ num;
 }
+uInt& operator++(const uInt& n) {
+    return n + ONE;
+}
+uInt& operator--(const uInt& n) {
+    return n - ONE;
+}
 // =========================== Performance Testing ============================
 
 void print_performance_test_results() {
@@ -1058,6 +1080,8 @@ void print_performance_test_results() {
         }
         std::cout << " || " << std::setw(8) << time << "ms, " << (time / total * 100) << "%" << std::endl;
     }
+    #else
+    throw std::runtime_error("ERROR: PERFORMANCE_TEST must be defined to run a performance test");
     #endif
 }
 

@@ -1,7 +1,7 @@
-#ifdef BASE_LINE
-#include "../src/uInt.hpp"
-#else
+#ifdef BETA
 #include "../src/uInt-beta.hpp"
+#else
+#include "../src/uInt.hpp"
 #endif
 #include <bitset>
 #include <chrono>
